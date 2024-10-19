@@ -82,8 +82,8 @@ const Layout = ({ children }) => {
                     <div className="flex items-center space-x-4 h-5/6 mr-4">
                         <div className="relative h-full p-1.5 border border-[#e2e8f0] rounded-full bg-[#eff4fb] group">
                             <GoBell className="text-xl text-gray-600 h-full sticky top-0 z-999 flex w-full group-hover:text-[#3c50e0]" />
-                            <span class="absolute -top-0.5 right-0 z-1 h-2 w-2 rounded-full bg-red-500 inline"
-                            ><span class="absolute -z-1 inline-flex h-full w-full animate-ping rounded-full bg-red-300"></span>
+                            <span className="absolute -top-0.5 right-0 z-1 h-2 w-2 rounded-full bg-red-500 inline"
+                            ><span className="absolute -z-1 inline-flex h-full w-full animate-ping rounded-full bg-red-300"></span>
                             </span>
                         </div>
                     </div>
