@@ -5,11 +5,10 @@ import { FaSearch, FaPlus, FaMinus, FaStar, FaCrown } from 'react-icons/fa'
 
 export default function PlayfulPointsManagement() {
   const [users, setUsers] = useState([
-    { id: 1, name: "Alice Johnson", points: 100, avatar: "/placeholder.svg?height=80&width=80" },
-    { id: 2, name: "Bob Smith", points: 75, avatar: "/placeholder.svg?height=80&width=80" },
-    { id: 3, name: "Charlie Brown", points: 90, avatar: "/placeholder.svg?height=80&width=80" },
-    { id: 4, name: "Diana Ross", points: 110, avatar: "/placeholder.svg?height=80&width=80" },
-    { id: 5, name: "Edward Norton", points: 85, avatar: "/placeholder.svg?height=80&width=80" },
+    { id: 1, name: "Nguyễn Phan Như Quỳnh", points: 100, avatar: "..." },
+    { id: 2, name: "Nguyễn Ngọc Thành Nam", points: 75, avatar: "..." },
+    { id: 3, name: "Nguyễn Lê Phong", points: 90, avatar: "..." },
+    { id: 4, name: "Trần Chí Công", points: 110, avatar: "..." },
   ])
   const [searchTerm, setSearchTerm] = useState("")
 
@@ -63,7 +62,7 @@ export default function PlayfulPointsManagement() {
             >
               <div className="p-6">
                 <div className="flex items-center space-x-4 mb-4">
-                  <img src={user.avatar} alt={user.name} className="w-20 h-20 rounded-full border-4 border-purple-400 shadow-md" />
+                  {/* <img src={user.avatar} alt={user.name} className="w-20 h-20 rounded-full border-4 border-purple-400 shadow-md" /> */}
                   <div>
                     <h2 className="text-2xl font-semibold text-purple-800">{user.name}</h2>
                     <p className="text-sm text-purple-600">Stargazer #{user.id}</p>
