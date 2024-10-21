@@ -1,18 +1,17 @@
 import React from 'react'
 import Layout from '../component/Layout'
+import VideoManager from '../component/VideoManagement/VideoManager'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+
 function Admin() {
     return (
         <>
             <Layout>
                 <div className="bg-white p-6 rounded shadow">
-                    <p>Đây là khu vực nội dung chính của trang.</p>
-                    <p>Bạn có thể thêm nhiều thông tin, bảng dữ liệu hoặc các thành phần tùy chỉnh ở đây.</p>
-                    {/* Thêm nội dung mẫu để test scroll */}
-                    <div className="mt-6 space-y-4">
-                        {[...Array(50)].map((_, i) => (
-                            <p key={i}>Nội dung mẫu {i + 1}</p>
-                        ))}
-                    </div>
+                        <Routes>
+                            <Route path="/" element={<h1>Trang Admin</h1>} />
+                            <Route path="/video-manage" element={<VideoManager />} />
+                        </Routes>
                 </div>
             </Layout>
         </>
