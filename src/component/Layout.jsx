@@ -45,13 +45,13 @@ const Layout = ({ children }) => {
                             <span>Thể loại</span>
                         </li>
                         <li className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded">
-                            <Link to="/" className='flex items-center'>
+                            <Link to="/" className='flex items-center space-x-3'>
                                 <FaGift />
                                 <span>Điểm thưởng</span>
                             </Link>
                         </li>
                         <li className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded">
-                            <Link to="/content-uploaded" className='flex items-center'>
+                            <Link to="/content-uploaded" className='flex items-center space-x-3'>
                                 <FaUpload />
                                 <span>Nội dung tải lên</span>
                             </Link>
