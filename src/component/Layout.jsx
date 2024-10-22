@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { FaUser, FaMusic, FaList, FaGift, FaUpload, FaComment, FaChartBar, FaBars, FaTimes } from 'react-icons/fa';
 import { GoBell } from "react-icons/go";
 import { IoIosSearch } from "react-icons/io";
+import { CiUser } from "react-icons/ci";
 const Layout = ({ children }) => {
     const [sidebarToggle, setSidebarToggle] = useState(false);
     const sidebarRef = useRef();
@@ -22,7 +23,7 @@ const Layout = ({ children }) => {
     return (
         <div className='flex h-screen overflow-hidden'>
             {/* Side Bar */}
-            <div ref={sidebarRef} className={`h-screen w-72 bg-gray-800 text-white lg:static absolute z-20 ${sidebarToggle ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 transition-all duration-300`}>
+            <div ref={sidebarRef} className={`h-screen w-72 bg-[#1c2434] text-white lg:static absolute z-20 ${sidebarToggle ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 transition-all duration-300`}>
                 <div className="flex p-4 text-center text-2xl font-bold  justify-between items-center">
                     <p>Admin Dashboard</p>
                     <div className='text-gray-500 block border border-gray-500 lg:hidden p-2 rounded-lg' onClick={() => setSidebarToggle(false)}>
@@ -63,7 +64,7 @@ const Layout = ({ children }) => {
                 </div>
             </div>
             <div className='relative flex flex-1 flex-col overflow-y-auto overflow-x-hidden '>
-                <div className="sticky top-0 z-999 w-full bg-white shadow px-8 lg:px-4 py-4 flex justify-between items-center">
+                <div className="sticky top-0 z-999 w-full bg-white shadow px-8 lg:px-4 py-5 flex justify-between items-center">
                     {/* Search Bar */}
                     <div className="flex items-center space-x-4">
                         <div className='block lg:hidden rounded-sm border border-stroke p-2 shadow-sm dark:border-strokedark dark:bg-boxdark text-2xl rounded-xl' onClick={() => setSidebarToggle(true)}>
@@ -79,13 +80,24 @@ const Layout = ({ children }) => {
                         </div>
                     </div>
                     {/* Notifications */}
-                    <div className="flex items-center space-x-4 h-5/6 mr-4">
-                        <div className="relative h-full p-1.5 border border-[#e2e8f0] rounded-full bg-[#eff4fb] group">
-                            <GoBell className="text-xl text-gray-600 h-full sticky top-0 z-999 flex w-full group-hover:text-[#3c50e0]" />
+                    <div className="flex items-center gap-8 h-full mr-4">
+                        <div className="relative h-5/6  p-1.5 border border-[#e2e8f0] rounded-full bg-[#eff4fb] group">
+                            <GoBell className="text-xl text-gray-600 h-full w-full group-hover:text-[#3c50e0]" />
                             <span className="absolute -top-0.5 right-0 z-1 h-2 w-2 rounded-full bg-red-500 inline"
                             ><span className="absolute -z-1 inline-flex h-full w-full animate-ping rounded-full bg-red-300"></span>
                             </span>
                         </div>
+
+                        <div className='flex gap-4 h-full'>
+                            <div className='text-right'>
+                                <p className='text-sm'>Name</p>
+                                <p className='text-xs'>Role</p>
+                            </div>
+                            <div className='class="relative h-full  p-1.5 border border-[#e2e8f0] rounded-full bg-[#eff4fb] group"'>
+                                <CiUser className="text-xl text-gray-600 h-full flex w-full" />
+                            </div>
+                        </div>
+
                     </div>
                 </div>
                 <div className="flex-1 bg-[#f1f5f9] p-8">
