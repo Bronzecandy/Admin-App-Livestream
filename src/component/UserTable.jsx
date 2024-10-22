@@ -57,7 +57,7 @@ const UserTable = () => {
     };
 
     return (
-        <div className="container mx-auto flex flex-col gap-4">
+        <div className="container mx-auto flex flex-col gap-4 bg-white p-8">
             <div className='flex justify-end'>
                 <button
                     className="bg-blue-500 text-white font-bold py-2 px-4 rounded"
