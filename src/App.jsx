@@ -6,10 +6,7 @@ function App() {
   return (
     <>
       <Router>
-        <Routes>
-            <Route path="/" element={<Admin/>} />
-            <Route path="/video-manage" element={<Admin/>} />
-        </Routes>
+        <Admin></Admin>
       </Router>
     </>
   )
