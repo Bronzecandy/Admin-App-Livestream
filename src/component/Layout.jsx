@@ -3,6 +3,7 @@ import { FaUser, FaMusic, FaList, FaGift, FaUpload, FaComment, FaChartBar, FaBar
 import { GoBell } from "react-icons/go";
 import { IoIosSearch } from "react-icons/io";
 import { CiUser } from "react-icons/ci";
+import { Link } from 'react-router-dom';
 const Layout = ({ children }) => {
     const [sidebarToggle, setSidebarToggle] = useState(false);
     const sidebarRef = useRef();
@@ -32,14 +33,19 @@ const Layout = ({ children }) => {
                 </div>
                 <div className="py-8 px-4">
                     <ul className="space-y-4">
-                        <li className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded">
-                            <FaUser />
-                            <span>Quản lý người dùng</span>
+                        <li className="hover:bg-gray-700 p-2 rounded">
+                            <Link to="/" className="flex items-center space-x-3">
+                                <FaUser />
+                                <span>Quản lý người dùng</span>
+                            </Link>
                         </li>
-                        <li className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded">
-                            <FaMusic />
-                            <span>Quản lý Video/Âm nhạc</span>
+                        <li className="flex items-center hover:bg-gray-700 p-2 rounded">
+                            <Link to="/video-manage" className="flex items-center space-x-3">
+                                <FaMusic />
+                                <span>Quản lý Video/Âm nhạc</span>
+                            </Link>
                         </li>
+
                         <li className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded">
                             <FaList />
                             <span>Thể loại</span>

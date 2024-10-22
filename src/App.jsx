@@ -1,10 +1,13 @@
 import React from "react"
 import Admin from "./pages/admin"
+import { BrowserRouter as Router } from 'react-router-dom';
 function App() {
 
   return (
     <>
-      <Admin></Admin>
+      <Router>
+        <Admin/>
+      </Router>
     </>
   )
 }
