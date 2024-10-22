@@ -1,106 +1,212 @@
-'use client'
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { FaTwitch, FaStar, FaClock, FaSearch, FaPlay, FaStop, FaFastForward, FaTimes } from 'react-icons/fa';
 
-import React, { useState, useMemo } from 'react'
-import { FaSearch, FaPlus, FaMinus, FaStar, FaCrown } from 'react-icons/fa'
+const RewardPointManager = () => {
+  const [accounts, setAccounts] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedAccount, setSelectedAccount] = useState(null);
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const [isLoading, setIsLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
 
-export default function PlayfulPointsManagement() {
-  const [users, setUsers] = useState([
-    { id: 1, name: "Nguyễn Phan Như Quỳnh", points: 100, avatar: "..." },
-    { id: 2, name: "Nguyễn Ngọc Thành Nam", points: 75, avatar: "..." },
-    { id: 3, name: "Nguyễn Lê Phong", points: 90, avatar: "..." },
-    { id: 4, name: "Trần Chí Công", points: 110, avatar: "..." },
-  ])
-  const [searchTerm, setSearchTerm] = useState("")
+  useEffect(() => {
+    fetchAccounts();
+    const interval = setInterval(() => {
+      setCurrentTime(prevTime => {
+        const newTime = new Date(prevTime.getTime() + 1000);
+        updatePoints(newTime);
+        return newTime;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
-  const filteredUsers = useMemo(() => {
-    return users.filter(user => 
-      user.name.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-  }, [users, searchTerm])
+  const fetchAccounts = async () => {
+    setIsLoading(true);
+    try {
+      const response = await axios.get('https://6717fde3b910c6a6e02acc1a.mockapi.io/StreamerPoint');
+      setAccounts(response.data);
+    } catch (error) {
+      console.error('Error fetching accounts:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-  const totalPoints = useMemo(() => {
-    return users.reduce((sum, user) => sum + user.points, 0)
-  }, [users])
+  const updatePoints = (currentTime) => {
+    setAccounts(prevAccounts =>
+      prevAccounts.map(account => {
+        if (account.isLive && account.liveStartTime) {
+          const liveDuration = (currentTime.getTime() - new Date(account.liveStartTime).getTime()) / (1000 * 60 * 60);
+          const additionalPoints = Math.floor(liveDuration / 3) * 50;
+          return { ...account, points: account.initialPoints + additionalPoints };
+        }
+        return account;
+      })
+    );
+  };
 
-  const updatePoints = (userId, increment) => {
-    setUsers(prevUsers =>
-      prevUsers.map(user =>
-        user.id === userId ? { ...user, points: Math.max(0, user.points + increment) } : user
-      )
-    )
-  }
+  const handleSearch = (event) => {
+    setSearchTerm(event.target.value);
+  };
+
+  const filteredAccounts = accounts.filter(account =>
+    account.username.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const handleSelectAccount = (account) => {
+    setSelectedAccount(account);
+    setShowModal(true);
+  };
+
+  const startLivestream = () => {
+    if (selectedAccount) {
+      const updatedAccounts = accounts.map(account =>
+        account.id === selectedAccount.id
+          ? { ...account, isLive: true, liveStartTime: currentTime.toISOString(), initialPoints: account.points }
+          : account
+      );
+      setAccounts(updatedAccounts);
+      setSelectedAccount(null);
+      setShowModal(false);
+    }
+  };
+
+  const endLivestream = () => {
+    if (selectedAccount) {
+      const updatedAccounts = accounts.map(account =>
+        account.id === selectedAccount.id
+          ? { ...account, isLive: false, liveStartTime: null }
+          : account
+      );
+      setAccounts(updatedAccounts);
+      setSelectedAccount(null);
+      setShowModal(false);
+    }
+  };
+
+  const increaseTime = () => {
+    setCurrentTime(prevTime => new Date(prevTime.getTime() + 3 * 60 * 60 * 1000)); // Increase by 3 hours
+  };
+
+  const formatDuration = (startTime) => {
+    if (!startTime) return '0h 0m';
+    const duration = currentTime.getTime() - new Date(startTime).getTime();
+    const hours = Math.floor(duration / (1000 * 60 * 60));
+    const minutes = Math.floor((duration % (1000 * 60 * 60)) / (1000 * 60));
+    return `${hours}h ${minutes}m`;
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-300 via-purple-300 to-indigo-400 p-8">
+    <div className="min-h-screen bg-gradient-to-br from-pink-300 via-purple-300 to-indigo-400 py-6 sm:py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-5xl font-bold mb-8 text-center text-white drop-shadow-lg">
-          Points Playground
+        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white text-center mb-8 sm:mb-12 animate-pulse">
+          Streamer Reward Points
         </h1>
-        <div className="flex flex-col md:flex-row justify-between items-center mb-8 bg-white bg-opacity-20 backdrop-blur-lg rounded-xl p-6 shadow-lg">
-          <div className="flex items-center space-x-4 mb-4 md:mb-0">
-            <FaCrown className="text-yellow-400 text-4xl animate-bounce" />
-            <span className="text-3xl font-semibold text-white">
-              Total Stars: <span className="text-yellow-300">{totalPoints}</span>
-            </span>
+        <div className="mb-8 flex items-center bg-white rounded-full overflow-hidden shadow-xl transition-all duration-300 hover:shadow-2xl">
+          <div className="p-3 sm:p-4">
+            <FaSearch className="text-gray-500 text-lg sm:text-xl" />
           </div>
-          <div className="relative w-full md:w-auto">
-            <input
-              type="text"
-              placeholder="Find friends..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full md:w-64 bg-white bg-opacity-50 text-purple-800 pl-10 pr-4 py-2 rounded-full border-2 border-purple-300 focus:outline-none focus:border-purple-500 placeholder-purple-400"
-            />
-            <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-purple-400" />
-          </div>
+          <input
+            type="text"
+            placeholder="Search streamers..."
+            className="w-full p-3 sm:p-4 outline-none text-lg sm:text-xl"
+            value={searchTerm}
+            onChange={handleSearch}
+          />
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredUsers.map((user) => (
-            <div
-              key={user.id}
-              className="bg-white bg-opacity-40 backdrop-blur-md rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2"
-            >
-              <div className="p-6">
-                <div className="flex items-center space-x-4 mb-4">
-                  {/* <img src={user.avatar} alt={user.name} className="w-20 h-20 rounded-full border-4 border-purple-400 shadow-md" /> */}
-                  <div>
-                    <h2 className="text-2xl font-semibold text-purple-800">{user.name}</h2>
-                    <p className="text-sm text-purple-600">Stargazer #{user.id}</p>
-                  </div>
-                </div>
-                <div className="mb-4">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-xl font-medium text-purple-800 flex items-center">
-                      <FaStar className="text-yellow-400 mr-2" />
-                      {user.points}
-                    </span>
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={() => updatePoints(user.id, -1)}
-                        className="p-2 rounded-full bg-red-400 text-white hover:bg-red-500 transition-colors duration-200 transform hover:scale-110"
-                      >
-                        <FaMinus className="h-6 w-6" />
-                      </button>
-                      <button
-                        onClick={() => updatePoints(user.id, 1)}
-                        className="p-2 rounded-full bg-green-400 text-white hover:bg-green-500 transition-colors duration-200 transform hover:scale-110"
-                      >
-                        <FaPlus className="h-6 w-6" />
-                      </button>
+        <div className="mt-8 sm:mt-12 text-center">
+          <button
+            onClick={increaseTime}
+            className="px-6 sm:px-8 py-3 sm:py-4 bg-violet-500 text-white text-lg sm:text-xl font-bold rounded-full hover:bg-violet-800 transition-colors transform hover:scale-105 shadow-lg"
+          >
+            <FaFastForward className="inline mr-2 sm:mr-3 text-xl sm:text-2xl" />
+            Increase Time by 3 Hours
+          </button>
+        </div>
+        <div className="my-4 sm:my-6 text-center text-violet-800 text-base sm:text-xl font-semibold">
+          Current Time: {currentTime.toLocaleString()}
+        </div>
+        {isLoading ? (
+          <div className="text-center text-white text-2xl sm:text-3xl">
+            <div className="animate-spin inline-block w-6 h-6 sm:w-8 sm:h-8 border-4 border-white border-t-transparent rounded-full mr-2"></div>
+            Loading...
+          </div>
+        ) : (
+          <div className="grid gap-6 sm:gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            {filteredAccounts.map(account => (
+              <div key={account.id} className="bg-white shadow-xl rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-2xl transform hover:-translate-y-2">
+                <div className="p-4 sm:p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center">
+                      <FaTwitch className={`text-3xl sm:text-4xl ${account.isLive ? 'text-red-500' : 'text-gray-400'}`} />
+                      <span className="ml-3 text-xl sm:text-2xl font-semibold text-gray-800">{account.username}</span>
+                    </div>
+                    <div className="flex items-center bg-yellow-100 px-3 py-1 sm:px-4 sm:py-2 rounded-full">
+                      <FaStar className="text-yellow-500 mr-2 text-lg sm:text-xl" />
+                      <span className="text-2xl sm:text-3xl font-bold text-gray-800">{account.points}</span>
                     </div>
                   </div>
-                  <div className="w-full bg-purple-200 rounded-full h-4 overflow-hidden">
-                    <div
-                      className="bg-gradient-to-r from-yellow-300 to-yellow-500 h-full rounded-full transition-all duration-300 ease-in-out"
-                      style={{ width: `${Math.min(100, (user.points / 200) * 100)}%` }}
-                    ></div>
-                  </div>
+                  {account.isLive && (
+                    <div className="mt-4 flex items-center text-sm sm:text-base text-gray-600 bg-green-100 p-2 sm:p-3 rounded-lg">
+                      <FaClock className="mr-2 text-green-500 text-base sm:text-lg" />
+                      <span>Live for: {formatDuration(account.liveStartTime)}</span>
+                    </div>
+                  )}
+                  <button
+                    onClick={() => handleSelectAccount(account)}
+                    className={`mt-4 sm:mt-6 w-full px-4 sm:px-6 py-2 sm:py-3 rounded-lg text-base sm:text-lg font-semibold transition-colors ${
+                      account.isLive
+                        ? 'bg-red-500 hover:bg-red-600 text-white'
+                        : 'bg-green-500 hover:bg-green-600 text-white'
+                    }`}
+                  >
+                    {account.isLive ? 'End Livestream' : 'Start Livestream'}
+                  </button>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
+      {showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 sm:p-8 max-w-md w-full animate-fadeInUp">
+            <div className="flex justify-between items-center mb-4 sm:mb-6">
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-800">
+                {selectedAccount.isLive ? 'End' : 'Start'} Livestream
+              </h2>
+              <button onClick={() => setShowModal(false)} className="text-gray-500 hover:text-gray-700">
+                <FaTimes className="text-xl sm:text-2xl" />
+              </button>
+            </div>
+            <p className="text-lg sm:text-xl mb-6 text-gray-600">
+              {selectedAccount.isLive
+                ? `Are you sure you want to end ${selectedAccount.username}'s livestream?`
+                : `Are you ready to start ${selectedAccount.username}'s livestream?`}
+            </p>
+            <div className="flex justify-end">
+              <button
+                onClick={() => setShowModal(false)}
+                className="px-4 sm:px-6 py-2 sm:py-3 bg-gray-300 text-gray-700 rounded-lg mr-4 hover:bg-gray-400 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={selectedAccount.isLive ? endLivestream : startLivestream}
+                className={`px-4 sm:px-6 py-2 sm:py-3 rounded-lg text-white transition-colors ${
+                  selectedAccount.isLive ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'
+                }`}
+              >
+                {selectedAccount.isLive ? 'End Livestream' : 'Start Livestream'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
-  )
-}
+  );
+};
+
+export default RewardPointManager;

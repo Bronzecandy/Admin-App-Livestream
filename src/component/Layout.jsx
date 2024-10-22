@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { FaUser, FaMusic, FaList, FaGift, FaUpload, FaComment, FaChartBar, FaBars, FaTimes } from 'react-icons/fa';
 import { GoBell } from "react-icons/go";
 import { IoIosSearch } from "react-icons/io";
+import { Link } from 'react-router-dom';
 const Layout = ({ children }) => {
     const [sidebarToggle, setSidebarToggle] = useState(false);
     const sidebarRef = useRef();
@@ -44,12 +45,16 @@ const Layout = ({ children }) => {
                             <span>Thể loại</span>
                         </li>
                         <li className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded">
-                            <FaGift />
-                            <span>Điểm thưởng</span>
+                            <Link to="/">
+                                <FaGift />
+                                <span>Điểm thưởng</span>
+                            </Link>
                         </li>
                         <li className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded">
-                            <FaUpload />
-                            <span>Nội dung tải lên</span>
+                            <Link to="/content-uploaded">
+                                <FaUpload />
+                                <span>Nội dung tải lên</span>
+                            </Link>
                         </li>
                         <li className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded">
                             <FaComment />
