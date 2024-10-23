@@ -59,8 +59,10 @@ const Layout = ({ children }) => {
                             <span>Nội dung tải lên</span>
                         </li>
                         <li className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded">
-                            <FaComment />
-                            <span>Quản lý bình luận</span>
+                            <Link to="/cmt-manage" className="flex items-center space-x-3">
+                                <FaComment />
+                                <span>Quản lý bình luận</span>
+                            </Link>
                         </li>
                         <li className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded">
                             <FaChartBar />
