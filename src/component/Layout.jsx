@@ -63,8 +63,10 @@ const Layout = ({ children }) => {
                             </Link>
                         </li>
                         <li className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded">
-                            <FaComment />
-                            <span>Quản lý bình luận</span>
+                            <Link to="/cmt-manage" className="flex items-center space-x-3">
+                                <FaComment />
+                                <span>Quản lý bình luận</span>
+                            </Link>
                         </li>
                         <li className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded">
                             <Link to="/video-reports" className="flex items-center space-x-3">
