@@ -51,7 +51,7 @@ const Layout = ({ children }) => {
                             <span>Thể loại</span>
                         </li>
                         <li className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded">
-                            <Link to="/" className='flex items-center space-x-3'>
+                            <Link to="/point-management" className='flex items-center space-x-3'>
                                 <FaGift />
                                 <span>Điểm thưởng</span>
                             </Link>
