@@ -7,6 +7,7 @@ import PointManagement from '../component/PointManagement'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import ContentUploaded from './../component/ContentUploaded';
 import VideoReports from '../component/VideoReports/VideoReports';
+import VideoCategories from '../component/VideoCategories/VideoCategories';
 
 
 function Admin() {
@@ -20,6 +21,7 @@ function Admin() {
                     <Route path='/content-uploaded' element={<ContentUploaded/>} />
                     <Route path="/video-reports" element={<VideoReports />} />
                     <Route path="/cmt-manage" element={<CommentManagement />} />
+                    <Route path="/video-categories" element={<VideoCategories />} />
                 </Routes>
             </Layout>
         </>

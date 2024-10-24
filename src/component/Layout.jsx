@@ -47,8 +47,10 @@ const Layout = ({ children }) => {
                         </li>
 
                         <li className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded">
-                            <FaList />
-                            <span>Thể loại</span>
+                            <Link to="/video-categories" className="flex items-center space-x-3">
+                                <FaList />
+                                <span>Thể loại</span>
+                            </Link>
                         </li>
                         <li className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded">
                             <Link to="/point-management" className='flex items-center space-x-3'>
