@@ -1,6 +1,8 @@
 import React from 'react';
 
 const VideoPlayer = ({ video, onClose }) => {
+    console.log(video.url);
+    
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-80 border z-50">
             <div className="relative w-full max-w-3xl bg-gray-800 rounded-lg shadow-lg">
@@ -16,7 +18,6 @@ const VideoPlayer = ({ video, onClose }) => {
                         controls 
                         className="absolute top-0 left-0 w-full h-full bg-black rounded-lg shadow-md" 
                         src={video.url} 
-                        style={{ objectFit: 'contain' }} 
                     />
                 </div>
             </div>

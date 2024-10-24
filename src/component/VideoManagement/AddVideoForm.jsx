@@ -1,164 +1,152 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
 
 const AddVideoForm = ({ onAdd, onEdit, video }) => {
-    const isEditing = !!video; // Kiểm tra xem có video để chỉnh sửa hay không
-    const [formData, setFormData] = useState({
-        title: '',
-        description: '',
-        duration: '',
-        size: '',
-        quality: '',
-        upload_time: '',
-        url: ''
+    const isEditing = !!video;
+
+    const initialValues = {
+        title: video?.title || '',
+        description: video?.description || '',
+        duration: video?.duration || '',
+        size: video?.size || '',
+        quality: video?.quality || '',
+        upload_time: video?.upload_time || '',
+        url: video?.url || ''
+    };
+
+    const validationSchema = Yup.object({
+        title: Yup.string().required('Title is required'),
+        description: Yup.string(),
+        duration: Yup.string().required('Duration is required'),
+        size: Yup.string().required('Size is required'),
+        quality: Yup.string().required('Quality is required'),
+        upload_time: Yup.date().required('Upload time is required'),
+        url: Yup.string().url('Invalid URL').required('Video URL is required'),
     });
 
-    // Nếu đang chỉnh sửa, populate form với dữ liệu video
-    useEffect(() => {
-        if (isEditing) {
-            setFormData(video);
+    const formik = useFormik({
+        initialValues,
+        validationSchema,
+        onSubmit: (values) => {
+            if (isEditing) {
+                onEdit({ ...values, id: video.id }); // Include the original ID for updates
+            } else {
+                onAdd(values); // No need to generate ID; API will do it
+            }
+            formik.resetForm(); // Reset form after submit
         }
-    }, [isEditing, video]);
+    });
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        if (isEditing) {
-            onEdit(formData); 
-        } else {
-            const newId = `video_${Math.random().toString(36).substring(2, 9)}`;
-            onAdd({ ...formData, id: newId }); 
-        }
-        resetForm();
-    };
-    const formatDuration = (durationInSeconds) => {
-        const hours = Math.floor(durationInSeconds / 3600);
-        const minutes = Math.floor((durationInSeconds % 3600) / 60);
-        const seconds = durationInSeconds % 60;
-
-        return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-    };
-
-    const handleFileChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            const videoURL = URL.createObjectURL(file);
-            setFormData({ ...formData, url: videoURL });
-
-            const sizeInMB = (file.size / (1024 * 1024)).toFixed(2);
-            setFormData((prevData) => ({
-                ...prevData,
-                size: `${sizeInMB} MB`,
-            }));
-
-            const videoElement = document.createElement('video');
-            videoElement.src = videoURL;
-
-            videoElement.onloadedmetadata = () => {
-                const durationInSeconds = Math.round(videoElement.duration);
-                if (durationInSeconds > 0) {
-                    const formattedDuration = formatDuration(durationInSeconds);
-                    setFormData((prevData) => ({
-                        ...prevData,
-                        duration: formattedDuration, // Lưu thời gian dưới dạng hh:mm:ss
-                        quality: file.type.split('/')[1].toUpperCase(),
-                    }));
-                } else {
-                    console.error("Video không có thời gian.");
-                    setFormData((prevData) => ({
-                        ...prevData,
-                        duration: "Không xác định",
-                    }));
-                }
-            };
-
-            videoElement.onerror = () => {
-                console.error("Lỗi khi tải video.");
-                setFormData((prevData) => ({
-                    ...prevData,
-                    duration: "Không xác định",
-                }));
-            };
-        }
-    };
-
-    const resetForm = () => {
-        setFormData({
-            title: '',
-            description: '',
-            duration: '',
-            size: '',
-            quality: '',
-            upload_time: '',
-            url: ''
-        });
-    };
-    console.log(formData.upload_time);
     const formatDateForInput = (dateString) => {
-        return dateString.slice(0, 16); // Lấy phần YYYY-MM-DDTHH:mm
+        return dateString ? dateString.slice(0, 16) : '';
     };
-    
+
     return (
-        <form className="mb-6" onSubmit={handleSubmit}>
+        <form className="mb-6" onSubmit={formik.handleSubmit}>
             <div className="grid grid-cols-2 gap-4">
-                <input
-                    className="border p-2 rounded"
-                    type="text"
-                    placeholder="Tiêu đề"
-                    value={formData.title}
-                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    required
-                />
-                <input
-                    className="border p-2 rounded"
-                    type="text"
-                    placeholder="Mô tả"
-                    value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    required
-                />
-                <input
-                    className="border p-2 rounded"
-                    type="text"
-                    placeholder="Thời gian"
-                    value={formData.duration}
-                    readOnly // Đặt là chỉ đọc
-                    required
-                />
-                <input
-                    className="border p-2 rounded"
-                    type="text"
-                    placeholder="Kích thước"
-                    value={formData.size}
-                    readOnly // Đặt là chỉ đọc
-                    required
-                />
-                <input
-                    className="border p-2 rounded"
-                    type="text"
-                    placeholder="Chất lượng"
-                    value={formData.quality}
-                    readOnly // Đặt là chỉ đọc
-                    required
-                />
-                <input
-                    className="border p-2 rounded"
-                    type="datetime-local"
-                    value={formatDateForInput(formData.upload_time)}
-                    onChange={(e) => setFormData({ ...formData, upload_time: e.target.value })}
-                    required
-                />
-                <input
-                    className="border p-2 rounded"
-                    type="file"
-                    accept="video/*"
-                    onChange={handleFileChange}
-                    required
-                />
+                <div>
+                    <label className="block text-gray-700">Tiêu đề</label>
+                    <input
+                        className="border p-2 rounded w-full"
+                        type="text"
+                        name="title"
+                        value={formik.values.title}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        required
+                    />
+                    {formik.touched.title && formik.errors.title && (
+                        <div className="text-red-500 text-sm">{formik.errors.title}</div>
+                    )}
+                </div>
+
+                <div>
+                    <label className="block text-gray-700">Thời gian</label>
+                    <input
+                        className="border p-2 rounded w-full"
+                        type="text"
+                        name="duration"
+                        value={formik.values.duration}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        required
+                    />
+                    {formik.touched.duration && formik.errors.duration && (
+                        <div className="text-red-500 text-sm">{formik.errors.duration}</div>
+                    )}
+                </div>
+
+                <div>
+                    <label className="block text-gray-700">Kích thước</label>
+                    <input
+                        className="border p-2 rounded w-full"
+                        type="text"
+                        name="size"
+                        value={formik.values.size}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        required
+                    />
+                    {formik.touched.size && formik.errors.size && (
+                        <div className="text-red-500 text-sm">{formik.errors.size}</div>
+                    )}
+                </div>
+
+                <div>
+                    <label className="block text-gray-700">Chất lượng</label>
+                    <input
+                        className="border p-2 rounded w-full"
+                        type="text"
+                        name="quality"
+                        value={formik.values.quality}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        required
+                    />
+                    {formik.touched.quality && formik.errors.quality && (
+                        <div className="text-red-500 text-sm">{formik.errors.quality}</div>
+                    )}
+                </div>
+
+                <div>
+                    <label className="block text-gray-700">Thời gian tải lên</label>
+                    <input
+                        className="border p-2 rounded w-full"
+                        type="datetime-local"
+                        name="upload_time"
+                        value={formik.values.upload_time ? formatDateForInput(formik.values.upload_time) : ''}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        required
+                    />
+                    {formik.touched.upload_time && formik.errors.upload_time && (
+                        <div className="text-red-500 text-sm">{formik.errors.upload_time}</div>
+                    )}
+                </div>
+
+                <div>
+                    <label className="block text-gray-700">URL video</label>
+                    <input
+                        className="border p-2 rounded w-full"
+                        type="text"
+                        name="url"
+                        value={formik.values.url}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        required
+                    />
+                    {formik.touched.url && formik.errors.url && (
+                        <div className="text-red-500 text-sm">{formik.errors.url}</div>
+                    )}
+                </div>
             </div>
+
             <button
                 type="submit"
                 className="bg-blue-500 text-white mt-4 px-6 py-2 rounded shadow hover:bg-blue-600"
             >
-                {isEditing ? 'Cập nhật Video' : 'Thêm Video'} {/* Thay đổi nút dựa trên isEditing */}
+                {isEditing ? 'Cập nhật Video' : 'Thêm Video'}
             </button>
         </form>
     );
