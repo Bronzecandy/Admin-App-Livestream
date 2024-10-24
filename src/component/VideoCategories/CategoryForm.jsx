@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { updateCategory } from './MockData'; // Import the correct function
+import { updateCategory, addCategory } from './MockData';
 
 const CategoryForm = ({ isOpen, category, onClose, onUpdate }) => {
   const [formData, setFormData] = useState({
@@ -13,6 +13,7 @@ const CategoryForm = ({ isOpen, category, onClose, onUpdate }) => {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const isEditMode = !!category;
 
   // Populate form data if category exists
   useEffect(() => {
@@ -24,10 +25,19 @@ const CategoryForm = ({ isOpen, category, onClose, onUpdate }) => {
         featured: category.featured || false,
         products: category.products || 0
       });
+    } else {
+      // Reset form for new category
+      setFormData({
+        name: '',
+        description: '',
+        status: 'active',
+        featured: false,
+        products: 0
+      });
     }
   }, [category]);
 
-  if (!isOpen) return null; // Don't render if not open
+  if (!isOpen) return null;
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -37,7 +47,6 @@ const CategoryForm = ({ isOpen, category, onClose, onUpdate }) => {
     }));
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -48,15 +57,19 @@ const CategoryForm = ({ isOpen, category, onClose, onUpdate }) => {
 
     setIsSubmitting(true);
     try {
-      // Call updateCategory function
-      const updatedCategory = await updateCategory({
-        ...category, // Existing category data
-        ...formData  // New data from the form
-      });
-      onUpdate(updatedCategory); // Notify parent about the update
-      onClose(); // Close the form
+      let updatedCategory;
+      if (isEditMode) {
+        updatedCategory = await updateCategory({
+          ...category,
+          ...formData
+        });
+      } else {
+        updatedCategory = await addCategory(formData);
+      }
+      onUpdate(updatedCategory);
+      onClose();
     } catch (err) {
-      setError('Failed to update category. Please try again.');
+      setError(`Failed to ${isEditMode ? 'update' : 'create'} category. Please try again.`);
     } finally {
       setIsSubmitting(false);
     }
@@ -67,7 +80,9 @@ const CategoryForm = ({ isOpen, category, onClose, onUpdate }) => {
       <div className="bg-white rounded-lg shadow-lg w-[800px] max-h-[90vh] overflow-y-auto">
         <div className="p-6">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold">Edit Category</h2>
+            <h2 className="text-xl font-semibold">
+              {isEditMode ? 'Edit Category' : 'New Category'}
+            </h2>
             <button
               onClick={onClose}
               className="text-gray-500 hover:text-gray-700"
@@ -172,7 +187,7 @@ const CategoryForm = ({ isOpen, category, onClose, onUpdate }) => {
                 disabled={isSubmitting}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
               >
-                {isSubmitting ? 'Saving...' : 'Update Category'}
+                {isSubmitting ? 'Saving...' : isEditMode ? 'Update Category' : 'Create Category'}
               </button>
             </div>
           </form>

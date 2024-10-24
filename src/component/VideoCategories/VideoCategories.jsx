@@ -1,19 +1,43 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import CategoryForm from './CategoryForm';
 import CategoryList from './CategoryList';
+import { fetchCategories } from './MockData';
 
 const VideoCategories = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    loadCategories();
+  }, []);
+
+  const loadCategories = async () => {
+    const data = await fetchCategories();
+    setCategories(data);
+  };
 
   const handleEditCategory = (category) => {
     setSelectedCategory(category);
-    setIsModalOpen(true);
+    setIsFormOpen(true);
+  };
+
+  const handleNewCategory = () => {
+    setSelectedCategory(null);
+    setIsFormOpen(true);
   };
 
   const handleUpdateCategory = (updatedCategory) => {
-    // Có thể thêm logic cập nhật danh sách categories ở đây nếu cần
-    setIsModalOpen(false);
+    setCategories(prev => {
+      if (selectedCategory) {
+        // Update existing category
+        return prev.map(cat => cat.id === updatedCategory.id ? updatedCategory : cat);
+      } else {
+        // Add new category
+        return [...prev, updatedCategory];
+      }
+    });
+    setIsFormOpen(false);
     setSelectedCategory(null);
   };
 
@@ -32,13 +56,17 @@ const VideoCategories = () => {
         </div>
         
         <CategoryForm
-          isOpen={isModalOpen}
+          isOpen={isFormOpen}
           category={selectedCategory}
-          onClose={() => setIsModalOpen(false)}
+          onClose={() => setIsFormOpen(false)}
           onUpdate={handleUpdateCategory}
         />
         
-        <CategoryList onEdit={handleEditCategory} />
+        <CategoryList 
+          categories={categories}
+          onEdit={handleEditCategory}
+          onNew={handleNewCategory}
+        />
       </div>
     </div>
   );
