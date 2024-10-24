@@ -67,8 +67,10 @@ const Layout = ({ children }) => {
                             <span>Quản lý bình luận</span>
                         </li>
                         <li className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded">
-                            <FaChartBar />
-                            <span>Thống kê báo cáo</span>
+                            <Link to="/video-reports" className="flex items-center space-x-3">
+                                <FaChartBar />
+                                <span>Thống kê báo cáo</span>
+                            </Link>
                         </li>
                     </ul>
                 </div>
