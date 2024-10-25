@@ -33,49 +33,50 @@ const Layout = ({ children }) => {
                 </div>
                 <div className="py-8 px-4">
                     <ul className="space-y-4">
+                        <li className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded">
+                            <Link to="/video-reports" className="flex items-center space-x-3">
+                                <FaChartBar />
+                                <span>Dashboard</span>
+                            </Link>
+                        </li>
                         <li className="hover:bg-gray-700 p-2 rounded">
                             <Link to="/" className="flex items-center space-x-3">
                                 <FaUser />
-                                <span>Quản lý người dùng</span>
+                                <span>Users</span>
                             </Link>
                         </li>
                         <li className="flex items-center hover:bg-gray-700 p-2 rounded">
                             <Link to="/video-manage" className="flex items-center space-x-3">
                                 <FaMusic />
-                                <span>Quản lý Video/Âm nhạc</span>
+                                <span>Videos/Audios</span>
                             </Link>
                         </li>
 
                         <li className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded">
                             <Link to="/video-categories" className="flex items-center space-x-3">
                                 <FaList />
-                                <span>Thể loại</span>
+                                <span>Categories</span>
                             </Link>
                         </li>
                         <li className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded">
                             <Link to="/point-management" className='flex items-center space-x-3'>
                                 <FaGift />
-                                <span>Điểm thưởng</span>
+                                <span>Points</span>
                             </Link>
                         </li>
                         <li className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded">
                             <Link to="/content-uploaded" className='flex items-center space-x-3'>
                                 <FaUpload />
-                                <span>Nội dung tải lên</span>
+                                <span>Content Upload</span>
                             </Link>
                         </li>
                         <li className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded">
                             <Link to="/cmt-manage" className="flex items-center space-x-3">
                                 <FaComment />
-                                <span>Quản lý bình luận</span>
+                                <span>Comments</span>
                             </Link>
                         </li>
-                        <li className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded">
-                            <Link to="/video-reports" className="flex items-center space-x-3">
-                                <FaChartBar />
-                                <span>Thống kê báo cáo</span>
-                            </Link>
-                        </li>
+
                     </ul>
                 </div>
             </div>
@@ -109,7 +110,7 @@ const Layout = ({ children }) => {
                                 <p className='text-sm'>Name</p>
                                 <p className='text-xs'>Role</p>
                             </div>
-                            <div className='class="relative h-full  p-1.5 border border-[#e2e8f0] rounded-full bg-[#eff4fb] group"'>
+                            <div className='relative h-full  p-1.5 border border-[#e2e8f0] rounded-full bg-[#eff4fb] group"'>
                                 <CiUser className="text-xl text-gray-600 h-full flex w-full" />
                             </div>
                         </div>
