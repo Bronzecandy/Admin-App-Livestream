@@ -27,8 +27,8 @@ export default function ContentUploaded() {
   };
 
   return (
-    <div className="container mx-auto p-6 bg-gray-100 min-h-screen">
-      <h1 className="text-3xl font-bold mb-8 text-center text-gray-800">Livestream Content Manager</h1>
+    <div className="container mx-auto p-6 bg-gray-50 min-h-screen">
+      <h1 className="text-xl font-bold mb-8">Livestream Content Manager</h1>
       
       <div className="mb-6 flex justify-between items-center">
         <div className="flex space-x-2">
@@ -63,11 +63,11 @@ export default function ContentUploaded() {
         <table className="w-full">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Content</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Views</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              <th className="px-6 py-3 text-left">Content</th>
+              <th className="px-6 py-3 text-center">Status</th>
+              <th className="px-6 py-3 text-center">Views</th>
+              <th className="px-6 py-3 text-center">Date</th>
+              <th className="px-6 py-3 text-center">Actions</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
@@ -92,18 +92,18 @@ export default function ContentUploaded() {
                     </div>
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-6 py-4 whitespace-nowrap text-center">
                   <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(content.status)}`}>
                     {content.status}
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">
                   {content.views.toLocaleString()}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">
                   {content.date}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
                   <button className="text-blue-600 hover:text-blue-900 mr-3">
                     <FiEye className="inline" />
                   </button>
