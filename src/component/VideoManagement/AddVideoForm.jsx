@@ -2,7 +2,7 @@ import React from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 
-const AddVideoForm = ({ onAdd, onEdit, video }) => {
+const AddVideoForm = ({ onAdd, onEdit, video,  setShowForm }) => {
     const isEditing = !!video;
 
     const initialValues = {
@@ -46,7 +46,7 @@ const AddVideoForm = ({ onAdd, onEdit, video }) => {
         <form className="mb-6" onSubmit={formik.handleSubmit}>
             <div className="grid grid-cols-2 gap-4">
                 <div>
-                    <label className="block text-gray-700">Tiêu đề</label>
+                    <label className="block text-gray-700">Title</label>
                     <input
                         className="border p-2 rounded w-full"
                         type="text"
@@ -62,7 +62,7 @@ const AddVideoForm = ({ onAdd, onEdit, video }) => {
                 </div>
 
                 <div>
-                    <label className="block text-gray-700">Thời gian</label>
+                    <label className="block text-gray-700">Duration</label>
                     <input
                         className="border p-2 rounded w-full"
                         type="text"
@@ -78,7 +78,7 @@ const AddVideoForm = ({ onAdd, onEdit, video }) => {
                 </div>
 
                 <div>
-                    <label className="block text-gray-700">Kích thước</label>
+                    <label className="block text-gray-700">Size</label>
                     <input
                         className="border p-2 rounded w-full"
                         type="text"
@@ -94,7 +94,7 @@ const AddVideoForm = ({ onAdd, onEdit, video }) => {
                 </div>
 
                 <div>
-                    <label className="block text-gray-700">Chất lượng</label>
+                    <label className="block text-gray-700">Quality</label>
                     <input
                         className="border p-2 rounded w-full"
                         type="text"
@@ -110,7 +110,7 @@ const AddVideoForm = ({ onAdd, onEdit, video }) => {
                 </div>
 
                 <div>
-                    <label className="block text-gray-700">Thời gian tải lên</label>
+                    <label className="block text-gray-700">Upload Time</label>
                     <input
                         className="border p-2 rounded w-full"
                         type="datetime-local"
@@ -126,7 +126,7 @@ const AddVideoForm = ({ onAdd, onEdit, video }) => {
                 </div>
 
                 <div>
-                    <label className="block text-gray-700">URL video</label>
+                    <label className="block text-gray-700">Video URL</label>
                     <input
                         className="border p-2 rounded w-full"
                         type="text"
@@ -141,13 +141,22 @@ const AddVideoForm = ({ onAdd, onEdit, video }) => {
                     )}
                 </div>
             </div>
-
-            <button
-                type="submit"
-                className="bg-blue-500 text-white mt-4 px-6 py-2 rounded shadow hover:bg-blue-600"
-            >
-                {isEditing ? 'Cập nhật Video' : 'Thêm Video'}
-            </button>
+            <div className="flex justify-end space-x-4 mt-3">
+                <button
+                    type="button"
+                    onClick={()=>setShowForm(false)}
+                    className="w-1/4 bg-gray-300 text-gray-800 py-2 rounded-md hover:bg-gray-400 transition-all duration-200 shadow-md"
+                 >
+                    Hủy
+                </button>
+                <button
+                    type="submit"
+                    className="w-1/4 bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition-all duration-200 shadow-md"
+         >
+                    {isEditing ? 'Update Video' : 'Add Video'}
+                </button>
+            </div>
+           
         </form>
     );
 };
