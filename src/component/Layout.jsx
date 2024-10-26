@@ -34,13 +34,13 @@ const Layout = ({ children }) => {
                 <div className="py-8 px-4">
                     <ul className="space-y-4">
                         <li className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded">
-                            <Link to="/video-reports" className="flex items-center space-x-3">
+                            <Link to="/" className="flex items-center space-x-3">
                                 <FaChartBar />
                                 <span>Dashboard</span>
                             </Link>
                         </li>
                         <li className="hover:bg-gray-700 p-2 rounded">
-                            <Link to="/" className="flex items-center space-x-3">
+                            <Link to="/users-manage" className="flex items-center space-x-3">
                                 <FaUser />
                                 <span>Users</span>
                             </Link>
