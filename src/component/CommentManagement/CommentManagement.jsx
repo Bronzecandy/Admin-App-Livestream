@@ -13,7 +13,7 @@ const CommentManagement = () => {
     const [streamIdFilter, setStreamIdFilter] = useState('all');
     const [commentToDelete, setCommentToDelete] = useState(null);
 
-    const sensitiveWords = ['offensive', 'swearing', 'stupid', 'crazy', 'bullshit', 'fuck'];
+    const sensitiveWords = ['offensive', 'swearing', 'stupid', 'crazy', 'bullshit', 'fuck', "ngu"];
 
     // Gọi API để lấy dữ liệu khi component được tải
     useEffect(() => {
@@ -119,11 +119,20 @@ const CommentManagement = () => {
 
     return (
         <div className="container mx-auto mt-8 p-5 bg-gray-100 shadow-lg rounded-lg">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Comment Management</h2>
+             <div className="flex items-center justify-between mb-6">
+          <h1 className="text-3xl font-semibold">Comments</h1>
+          <div className="flex items-center space-x-4">
+            <nav className="text-sm">
+              <span className="text-gray-500">Dashboard</span>
+              <span className="mx-2">/</span>
+              <span>Comments</span>
+            </nav>
+          </div>
+        </div>
             {/* Dropdown để lọc bình luận theo trạng thái và liveStreamId */}
             <div className="mb-4 flex justify-between">
                 <div className="w-1/2 mr-2">
-                    <label htmlFor="statusFilter" className="mr-2 text-gray-800 font-semibold text-lg">Status:</label>
+                    <label htmlFor="statusFilter" className="mr-2 text-gray-600 font-semibold text-lg">Status</label>
                     <select
                         id="statusFilter"
                         value={statusFilter}
@@ -136,7 +145,7 @@ const CommentManagement = () => {
                     </select>
                 </div>
                 <div className="w-1/2 ml-2">
-                    <label htmlFor="streamIdFilter" className="mr-2 text-gray-800 font-semibold text-lg">Live Stream ID:</label>
+                    <label htmlFor="streamIdFilter" className="mr-2 text-gray-600 font-semibold text-lg">Live Stream ID</label>
                     <select
                         id="streamIdFilter"
                         value={streamIdFilter}
