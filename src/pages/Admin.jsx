@@ -15,11 +15,11 @@ function Admin() {
         <>
             <Layout>
                 <Routes>
-                    <Route path="/" element={<UserTable />} />
+                    <Route path="/" element={<VideoReports />} />
                     <Route path="/video-manage" element={<VideoManager />} />
                     <Route path='/point-management' element={<PointManagement/>} />
                     <Route path='/content-uploaded' element={<ContentUploaded/>} />
-                    <Route path="/video-reports" element={<VideoReports />} />
+                    <Route path="/users-manage" element={<UserTable />} />
                     <Route path="/cmt-manage" element={<CommentManagement />} />
                     <Route path="/video-categories" element={<VideoCategories />} />
                 </Routes>
