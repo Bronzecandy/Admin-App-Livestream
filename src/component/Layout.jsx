@@ -87,14 +87,7 @@ const Layout = ({ children }) => {
                         <div className='block lg:hidden rounded-sm border border-stroke p-2 shadow-sm dark:border-strokedark dark:bg-boxdark text-2xl rounded-xl' onClick={() => setSidebarToggle(true)}>
                             <FaBars />
                         </div>
-                        <div className="flex items-center border border-[#64748b] rounded-3xl w-80 px-4 py-2 focus-within:border-[#3c50e0] ">
-                            <input
-                                type="text"
-                                className="flex-grow outline-none"
-                                placeholder="Tìm kiếm..."
-                            />
-                            <IoIosSearch className=" text-[#64748b] text-2xl hover:text-[#3c50e0]  cursor-pointer" />
-                        </div>
+                        
                     </div>
                     {/* Notifications */}
                     <div className="flex items-center gap-8 h-full mr-4">
