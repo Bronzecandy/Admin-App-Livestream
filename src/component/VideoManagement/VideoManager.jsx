@@ -12,14 +12,19 @@ const VideoManager = () => {
     const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 
     useEffect(() => {
-        axios.get('https://671893417fc4c5ff8f4a0505.mockapi.io/videos')
+        axios.get('https://social-media-z5a2.onrender.com/api/videos/', {
+            headers: {
+                Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzFhMTRmNDZkMDUwODg0MjNlZWFiOTEiLCJpcCI6IjExNi4xMTEuMTg1LjIyNiwgMTcyLjY4LjE3NC42MiwgMTAuMjA0LjEuOTIiLCJpYXQiOjE3MzAyMTIxMTcsImV4cCI6MTczMDIzMzcxN30.6_5jBMXmGkTSQRJfb3iIBCU7B8xiqpcoi7ma6YjlNWI`
+            }
+        })
             .then(response => {
-                setVideos(response.data);
+                setVideos(response.data.videos);
             })
             .catch(error => {
                 console.error('Error fetching data:', error);
             });
     }, []);
+
 
     const [playingVideo, setPlayingVideo] = useState(null);
     const [showForm, setShowForm] = useState(false); 
@@ -37,6 +42,7 @@ const VideoManager = () => {
                 });
         }
     };
+    console.log(videos);
 
     const handlePlayVideo = (video) => {
         setPlayingVideo(video);
@@ -56,7 +62,7 @@ const VideoManager = () => {
     const handleAddVideo = (newVideo) => {
         axios.post('https://671893417fc4c5ff8f4a0505.mockapi.io/videos', newVideo)
             .then(response => {
-                setVideos([...videos, response.data]); 
+                setVideos([...videos, response.data.videos]); 
                 setShowForm(false); 
             })
             .catch(error => {
@@ -111,38 +117,44 @@ const VideoManager = () => {
                 </div>
             </div>
 
-          
-
+            {/* Video table */}
             <div className="overflow-x-auto">
-                <table className="min-w-full bg-white  table-auto ">
-                    <thead >
-                        <tr className='bg-[#f7f9fc] text-[#64748B] text-center'>
+                <table className="min-w-full bg-white table-auto">
+                    <thead>
+                        <tr className="bg-[#f7f9fc] text-[#64748B] text-center">
                             <th className="px-4 py-2">Title</th>
                             <th className="px-4 py-2">Description</th>
-                            <th className="px-4 py-2">Duration</th>
-                            <th className="px-4 py-2">Size</th>
-                            <th className="px-4 py-2">Quality</th>
+                            <th className="px-4 py-2">Video URL</th>
+                            <th className="px-4 py-2">Uploaded</th>
+                            <th className="px-4 py-2">Views</th>
+                            <th className="px-4 py-2">Mode</th>
                             <th className="px-4 py-2">Upload Time</th>
-                            <th className="px-4 py-2">Watch Video</th>
+                            <th className="px-4 py-2">Watch Videos</th>
                             <th className="px-4 py-2">Actions</th>
                         </tr>
+
                     </thead>
                     <tbody className="text-gray-700 text-sm">
-                        { videos.length>0?(videos.map(video => (
-                            <VideoRow
-                                key={video.id}
-                                video={video}
-                                onEdit={() => openEditForm(video)} // Mở form chỉnh sửa
-                                onDelete={deleteVideo}
-                                onPlay={handlePlayVideo}
-                            />
-                        ))): (
+                        {videos.length > 0 ? (
+                            videos.map((video) => (
+                                <VideoRow
+                                    key={video._id}
+                                    video={video}
+                                    onEdit={() => openEditForm(video)}
+                                    onDelete={deleteVideo}
+                                    onPlay={handlePlayVideo}
+                                />
+                            ))
+                        ) : (
                             <tr>
-                                <td className="px-4 py-2" colSpan="5">No data available</td>
+                                <td className="px-4 py-2 text-center" colSpan="5">No data available</td>
                             </tr>
                         )}
                     </tbody>
                 </table>
+
+
+                {/* Pagination */}
                 <div className="flex justify-between items-center mt-6">
                     <div className="flex items-center space-x-2">
                         <span>Results per page:</span>
@@ -183,15 +195,16 @@ const VideoManager = () => {
                         </button>
                     </div>
                 </div>
-
             </div>
 
+            {/* Video player */}
             {playingVideo && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
                     <VideoPlayer video={playingVideo} onClose={closeVideoPlayer} />
                 </div>
             )}
 
+            {/* Video form */}
             {showForm && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
                     <div className="bg-white p-4 rounded-lg shadow-lg w-1/2">
@@ -204,7 +217,6 @@ const VideoManager = () => {
                             video={editingVideo}
                             setShowForm={setShowForm}
                         />
-                       
                     </div>
                 </div>
             )}
