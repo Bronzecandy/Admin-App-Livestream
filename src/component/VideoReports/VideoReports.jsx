@@ -74,16 +74,48 @@ const StatCard = ({ icon: Icon, title, value, className }) => (
   </div>
 );
 
+const LoadingSpinner = () => (
+  <div className="bg-white h-full w-full flex justify-center items-center min-h-[400px]">
+    <div className="flex flex-col items-center">
+      <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+      <span className="mt-4 text-gray-600">Loading...</span>
+    </div>
+  </div>
+);
+
 const VideoReport = () => {
   const [timeRange, setTimeRange] = useState('30d');
   const [analyticsData, setAnalyticsData] = useState([]);
   const [activeTab, setActiveTab] = useState('views');
-  
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    // Simulate API call
-    const days = timeRange === '7d' ? 7 : timeRange === '30d' ? 30 : 90;
-    setAnalyticsData(generateMockData(days));
+    const fetchData = async () => {
+      setLoading(true);
+
+      try {
+        // Simulate API call with delay
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        const days = timeRange === '7d' ? 7 : timeRange === '30d' ? 30 : 90;
+        setAnalyticsData(generateMockData(days));
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, [timeRange]);
+
+  const handleTabChange = (tab) => {
+    setLoading(true);
+    setActiveTab(tab);
+    // Simulate loading data for new tab
+    setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+  };
 
   const timeRangeButtons = [
     { value: '7d', label: '7 Days' },
@@ -124,179 +156,163 @@ const VideoReport = () => {
         </div>
       </div>
 
-      {/* Stat Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          icon={FiEye}
-          title="Total Views"
-          value={analyticsData.reduce((sum, day) => sum + day.views, 0)}
-        />
-        <StatCard
-          icon={FiHeart}
-          title="Total Likes"
-          value={analyticsData.reduce((sum, day) => sum + day.likes, 0)}
-        />
-        <StatCard
-          icon={FiUsers}
-          title="Active Users"
-          value={analyticsData[analyticsData.length - 1]?.activeUsers || 0}
-        />
-        <StatCard
-          icon={FiVideo}
-          title="New Videos"
-          value={analyticsData.reduce((sum, day) => sum + day.newVideos, 0)}
-        />
-      </div>
-
-      {/* Tabs Navigation */}
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <div className="flex border-b border-gray-200 mb-6">
-          {tabs.map(({ value, label }) => (
-            <button
-              key={value}
-              onClick={() => setActiveTab(value)}
-              className={`py-2 px-4 border-b-2 transition-colors ${
-                activeTab === value
-                  ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-
-        {/* Tab Contents */}
-        {activeTab === 'views' && (
-          <div className="h-[400px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={analyticsData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Line type="monotone" dataKey="views" stroke="#3B82F6" name="Views" />
-                <Line type="monotone" dataKey="likes" stroke="#10B981" name="Likes" />
-                <Line type="monotone" dataKey="comments" stroke="#F59E0B" name="Comments" />
-              </LineChart>
-            </ResponsiveContainer>
+      {/* Main content with loading state */}
+      {loading ? (
+        <LoadingSpinner />
+      ) : (
+        <>
+          {/* Stat Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <StatCard
+              icon={FiEye}
+              title="Total Views"
+              value={analyticsData.reduce((sum, day) => sum + day.views, 0)}
+            />
+            <StatCard
+              icon={FiHeart}
+              title="Total Likes"
+              value={analyticsData.reduce((sum, day) => sum + day.likes, 0)}
+            />
+            <StatCard
+              icon={FiUsers}
+              title="Active Users"
+              value={analyticsData[analyticsData.length - 1]?.activeUsers || 0}
+            />
+            <StatCard
+              icon={FiVideo}
+              title="New Videos"
+              value={analyticsData.reduce((sum, day) => sum + day.newVideos, 0)}
+            />
           </div>
-        )}
 
-        {activeTab === 'users' && (
-          <div className="overflow-x-auto">
-            <table className="w-full whitespace-nowrap">
-              <thead>
-                <tr className="bg-gray-50">
-                  <th className="text-left p-4 font-semibold text-gray-600">Username</th>
-                  <th className="text-left p-4 font-semibold text-gray-600">Login Count</th>
-                  <th className="text-left p-4 font-semibold text-gray-600">Online Time</th>
-                  <th className="text-left p-4 font-semibold text-gray-600">Last Active</th>
-                </tr>
-              </thead>
-              <tbody>
-                {mockUserData.map(user => (
-                  <tr key={user.id} className="border-b border-gray-200 hover:bg-gray-50">
-                    <td className="p-4">{user.username}</td>
-                    <td className="p-4">{user.loginCount}</td>
-                    <td className="p-4">{user.onlineTime}</td>
-                    <td className="p-4">{user.lastActive}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-
-{activeTab === 'revenue' && (
-          <div className="space-y-6">
-            {/* Revenue Summary Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div className="p-4 bg-blue-50 rounded-lg">
-                <h3 className="text-sm text-blue-600">Ads Revenue</h3>
-                <p className="text-xl font-bold">${totalAdsRevenue.toFixed(2)}</p>
-              </div>
-              <div className="p-4 bg-green-50 rounded-lg">
-                <h3 className="text-sm text-green-600">Subscription Revenue</h3>
-                <p className="text-xl font-bold">${totalSubscriptionRevenue.toFixed(2)}</p>
-              </div>
-              <div className="p-4 bg-purple-50 rounded-lg">
-                <h3 className="text-sm text-purple-600">Donation Revenue</h3>
-                <p className="text-xl font-bold">${totalDonationRevenue.toFixed(2)}</p>
-              </div>
-              <div className="p-4 bg-gray-50 rounded-lg">
-                <h3 className="text-sm text-gray-600">Total Revenue</h3>
-                <p className="text-xl font-bold">${totalRevenue.toFixed(2)}</p>
-              </div>
+          {/* Tabs Navigation and Content */}
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <div className="flex border-b border-gray-200 mb-6">
+              {tabs.map(({ value, label }) => (
+                <button
+                  key={value}
+                  onClick={() => handleTabChange(value)}
+                  className={`py-2 px-4 border-b-2 transition-colors ${
+                    activeTab === value
+                      ? 'border-blue-600 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
             </div>
-            
-            {/* Revenue Chart */}
-            <div className="h-[400px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={analyticsData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Area 
-                    type="monotone" 
-                    dataKey="adsRevenue" 
-                    stackId="1" 
-                    stroke="#3B82F6" 
-                    fill="#3B82F6" 
-                    name="Ads"
-                  />
-                  <Area 
-                    type="monotone" 
-                    dataKey="subscriptionRevenue" 
-                    stackId="1" 
-                    stroke="#10B981" 
-                    fill="#10B981" 
-                    name="Subscriptions"
-                  />
-                  <Area 
-                    type="monotone" 
-                    dataKey="donationRevenue" 
-                    stackId="1" 
-                    stroke="#8B5CF6" 
-                    fill="#8B5CF6" 
-                    name="Donations"
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        )}
 
-        {activeTab === 'videos' && (
-          <div className="overflow-x-auto">
-            <table className="w-full whitespace-nowrap">
-              <thead>
-                <tr className="bg-gray-50">
-                  <th className="text-left p-4 font-semibold text-gray-600">Title</th>
-                  <th className="text-left p-4 font-semibold text-gray-600">Views</th>
-                  <th className="text-left p-4 font-semibold text-gray-600">Likes</th>
-                  <th className="text-left p-4 font-semibold text-gray-600">Comments</th>
-                  <th className="text-left p-4 font-semibold text-gray-600">Duration</th>
-                </tr>
-              </thead>
-              <tbody>
-                {mockVideoData.map(video => (
-                  <tr key={video.id} className="border-b border-gray-200 hover:bg-gray-50">
-                    <td className="p-4">{video.title}</td>
-                    <td className="p-4">{video.views}</td>
-                    <td className="p-4">{video.likes}</td>
-                    <td className="p-4">{video.comments}</td>
-                    <td className="p-4">{video.duration}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            {/* Tab Contents */}
+            {activeTab === 'views' && (
+              <div className="h-[400px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={analyticsData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="date" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Line type="monotone" dataKey="views" stroke="#3B82F6" name="Views" />
+                    <Line type="monotone" dataKey="likes" stroke="#10B981" name="Likes" />
+                    <Line type="monotone" dataKey="comments" stroke="#F59E0B" name="Comments" />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+
+            {activeTab === 'revenue' && (
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <div className="p-4 bg-blue-50 rounded-lg">
+                    <h3 className="text-sm text-blue-600">Ads Revenue</h3>
+                    <p className="text-xl font-bold">${totalAdsRevenue.toFixed(2)}</p>
+                  </div>
+                  <div className="p-4 bg-green-50 rounded-lg">
+                    <h3 className="text-sm text-green-600">Subscription Revenue</h3>
+                    <p className="text-xl font-bold">${totalSubscriptionRevenue.toFixed(2)}</p>
+                  </div>
+                  <div className="p-4 bg-purple-50 rounded-lg">
+                    <h3 className="text-sm text-purple-600">Donation Revenue</h3>
+                    <p className="text-xl font-bold">${totalDonationRevenue.toFixed(2)}</p>
+                  </div>
+                  <div className="p-4 bg-gray-50 rounded-lg">
+                    <h3 className="text-sm text-gray-600">Total Revenue</h3>
+                    <p className="text-xl font-bold">${totalRevenue.toFixed(2)}</p>
+                  </div>
+                </div>
+                
+                <div className="h-[400px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={analyticsData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="date" />
+                      <YAxis />
+                      <Tooltip />
+                      <Legend />
+                      <Area type="monotone" dataKey="adsRevenue" stackId="1" stroke="#3B82F6" fill="#3B82F6" name="Ads" />
+                      <Area type="monotone" dataKey="subscriptionRevenue" stackId="1" stroke="#10B981" fill="#10B981" name="Subscriptions" />
+                      <Area type="monotone" dataKey="donationRevenue" stackId="1" stroke="#8B5CF6" fill="#8B5CF6" name="Donations" />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'users' && (
+              <div className="overflow-x-auto">
+                <table className="w-full whitespace-nowrap">
+                  <thead>
+                    <tr className="bg-gray-50">
+                      <th className="text-left p-4 font-semibold text-gray-600">Username</th>
+                      <th className="text-left p-4 font-semibold text-gray-600">Login Count</th>
+                      <th className="text-left p-4 font-semibold text-gray-600">Online Time</th>
+                      <th className="text-left p-4 font-semibold text-gray-600">Last Active</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {mockUserData.map(user => (
+                      <tr key={user.id} className="border-b border-gray-200 hover:bg-gray-50">
+                        <td className="p-4">{user.username}</td>
+                        <td className="p-4">{user.loginCount}</td>
+                        <td className="p-4">{user.onlineTime}</td>
+                        <td className="p-4">{user.lastActive}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {activeTab === 'videos' && (
+              <div className="overflow-x-auto">
+                <table className="w-full whitespace-nowrap">
+                  <thead>
+                    <tr className="bg-gray-50">
+                      <th className="text-left p-4 font-semibold text-gray-600">Title</th>
+                      <th className="text-left p-4 font-semibold text-gray-600">Views</th>
+                      <th className="text-left p-4 font-semibold text-gray-600">Likes</th>
+                      <th className="text-left p-4 font-semibold text-gray-600">Comments</th>
+                      <th className="text-left p-4 font-semibold text-gray-600">Duration</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {mockVideoData.map(video => (
+                      <tr key={video.id} className="border-b border-gray-200 hover:bg-gray-50">
+                        <td className="p-4">{video.title}</td>
+                        <td className="p-4">{video.views}</td>
+                        <td className="p-4">{video.likes}</td>
+                        <td className="p-4">{video.comments}</td>
+                        <td className="p-4">{video.duration}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </>
+      )}
     </div>
   );
 };
