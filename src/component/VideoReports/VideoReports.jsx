@@ -9,7 +9,9 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
-  ResponsiveContainer
+  ResponsiveContainer,
+  Area,
+  AreaChart
 } from 'recharts';
 
 // Mock data generator with real days data
@@ -18,6 +20,12 @@ const generateMockData = (days = 30) => {
   for (let i = 0; i < days; i++) {
     const date = new Date();
     date.setDate(date.getDate() - i);
+
+    const views = Math.floor(Math.random() * 1000) + 500;
+    const adsRevenue = views * (Math.random() * 0.3 + 0.2); // $0.2-0.5 per view
+    const subscriptionRevenue = views * (Math.random() * 0.4 + 0.3); // $0.3-0.7 per view
+    const donationRevenue = views * (Math.random() * 0.2 + 0.1); // $0.1-0.3 per view
+
     data.unshift({
       date: date.toLocaleDateString(),
       views: Math.floor(Math.random() * 1000) + 500,
@@ -26,6 +34,10 @@ const generateMockData = (days = 30) => {
       shares: Math.floor(Math.random() * 30) + 10,
       activeUsers: Math.floor(Math.random() * 300) + 200,
       newVideos: Math.floor(Math.random() * 20) + 5,
+      adsRevenue: parseFloat(adsRevenue.toFixed(2)),
+      subscriptionRevenue: parseFloat(subscriptionRevenue.toFixed(2)),
+      donationRevenue: parseFloat(donationRevenue.toFixed(2)),
+      totalRevenue: parseFloat((adsRevenue + subscriptionRevenue + donationRevenue).toFixed(2)),
     });
   }
   return data;
@@ -81,9 +93,15 @@ const VideoReport = () => {
 
   const tabs = [
     { value: 'views', label: 'Views & Engagement' },
+    { value: 'revenue', label: 'Revenue' },
     { value: 'users', label: 'User Activity' },
     { value: 'videos', label: 'Video Performance' },
   ];
+
+  const totalRevenue = analyticsData.reduce((sum, day) => sum + day.totalRevenue, 0);
+  const totalAdsRevenue = analyticsData.reduce((sum, day) => sum + day.adsRevenue, 0);
+  const totalSubscriptionRevenue = analyticsData.reduce((sum, day) => sum + day.subscriptionRevenue, 0);
+  const totalDonationRevenue = analyticsData.reduce((sum, day) => sum + day.donationRevenue, 0);
 
   return (
     <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
@@ -188,6 +206,67 @@ const VideoReport = () => {
                 ))}
               </tbody>
             </table>
+          </div>
+        )}
+
+{activeTab === 'revenue' && (
+          <div className="space-y-6">
+            {/* Revenue Summary Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="p-4 bg-blue-50 rounded-lg">
+                <h3 className="text-sm text-blue-600">Ads Revenue</h3>
+                <p className="text-xl font-bold">${totalAdsRevenue.toFixed(2)}</p>
+              </div>
+              <div className="p-4 bg-green-50 rounded-lg">
+                <h3 className="text-sm text-green-600">Subscription Revenue</h3>
+                <p className="text-xl font-bold">${totalSubscriptionRevenue.toFixed(2)}</p>
+              </div>
+              <div className="p-4 bg-purple-50 rounded-lg">
+                <h3 className="text-sm text-purple-600">Donation Revenue</h3>
+                <p className="text-xl font-bold">${totalDonationRevenue.toFixed(2)}</p>
+              </div>
+              <div className="p-4 bg-gray-50 rounded-lg">
+                <h3 className="text-sm text-gray-600">Total Revenue</h3>
+                <p className="text-xl font-bold">${totalRevenue.toFixed(2)}</p>
+              </div>
+            </div>
+            
+            {/* Revenue Chart */}
+            <div className="h-[400px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={analyticsData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="date" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Area 
+                    type="monotone" 
+                    dataKey="adsRevenue" 
+                    stackId="1" 
+                    stroke="#3B82F6" 
+                    fill="#3B82F6" 
+                    name="Ads"
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="subscriptionRevenue" 
+                    stackId="1" 
+                    stroke="#10B981" 
+                    fill="#10B981" 
+                    name="Subscriptions"
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="donationRevenue" 
+                    stackId="1" 
+                    stroke="#8B5CF6" 
+                    fill="#8B5CF6" 
+                    name="Donations"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         )}
 
