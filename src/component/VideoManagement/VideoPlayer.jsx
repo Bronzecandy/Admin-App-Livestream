@@ -1,4 +1,5 @@
 import React from 'react';
+import HLSPlayer from './../VideoCategories/HLSPlayer ';
 
 const VideoPlayer = ({ video, onClose }) => {
     return (
@@ -12,19 +13,10 @@ const VideoPlayer = ({ video, onClose }) => {
                 </button>
                 <h3 className="text-xl text-white mb-2 text-center font-semibold">Phát Video: {video.title}</h3>
                 <div className="relative w-full h-0" style={{ paddingBottom: '56.25%' }}>
-                    {video.videoEmbedUrl ? (
-                        <iframe
-                            title={video.title}
-                            className="absolute top-0 left-0 w-full h-full rounded-lg shadow-md"
-                            src={video.videoEmbedUrl}
-                            allowFullScreen
-                        />
+                    {video.videoUrl ? (
+                        <HLSPlayer src={video.videoUrl}/>
                     ) : (
-                        <video
-                            controls
-                            className="absolute top-0 left-0 w-full h-full bg-black rounded-lg shadow-md"
-                            src={video.videoUrl}
-                        />
+                     <h1>Không có</h1>
                     )}
                 </div>
             </div>

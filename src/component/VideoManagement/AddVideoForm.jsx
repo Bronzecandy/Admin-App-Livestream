@@ -1,18 +1,24 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 
-const AddVideoForm = ({ onAdd, onEdit, video,  setShowForm }) => {
-    const isEditing = !!video;
-
+const AddVideoForm = ({ onEdit, video, setShowForm }) => {
+    console.log(video.thumbnailUrl);
+    
+    const [thumbnailPreview, setThumbnailPreview] = useState(video.thumbnailUrl);
+    const handleFileChange = (event) => {
+        const file = event.currentTarget.files[0];
+        if (file) {
+            formik.setFieldValue("thumbnailUrl", file);  // Lưu tệp vào Formik
+            setThumbnailPreview(URL.createObjectURL(file));  // Tạo URL xem trước
+        }
+    };
     const initialValues = {
         title: video?.title || '',
         description: video?.description || '',
-        duration: video?.duration || '',
-        size: video?.size || '',
-        quality: video?.quality || '',
-        upload_time: video?.upload_time || '',
-        url: video?.url || ''
+        categoryIds: video?.categoryIds || [],
+        enumMode: video?.enumMode || 'public',
+        thumbnailUrl: video?.thumbnailUrl || ''
     };
 
     const validationSchema = Yup.object({
@@ -23,32 +29,29 @@ const AddVideoForm = ({ onAdd, onEdit, video,  setShowForm }) => {
         quality: Yup.string().required('Quality is required'),
         upload_time: Yup.date().required('Upload time is required'),
         url: Yup.string().url('Invalid URL').required('Video URL is required'),
+        categoryIds: Yup.array().of(Yup.string()).required('Category is required'),
+        enumMode: Yup.string().required('Mode is required'),
+        thumbnailUrl: Yup.string().url('Invalid URL').required('Thumbnail URL is required'),
     });
 
     const formik = useFormik({
+
         initialValues,
-        validationSchema,
+        // validationSchema,
         onSubmit: (values) => {
-            if (isEditing) {
-                onEdit({ ...values, id: video.id }); // Include the original ID for updates
-            } else {
-                onAdd(values); // No need to generate ID; API will do it
-            }
-            formik.resetForm(); // Reset form after submit
+            onEdit({ ...values, id: video._id });
+            formik.resetForm();
+            setShowForm(false);
         }
     });
 
-    const formatDateForInput = (dateString) => {
-        return dateString ? dateString.slice(0, 16) : '';
-    };
-
     return (
-        <form className="mb-6" onSubmit={formik.handleSubmit}>
-            <div className="grid grid-cols-2 gap-4">
+        <form className="p-6 bg-white " onSubmit={formik.handleSubmit}>
+            <div className="grid grid-cols-2 gap-6">
                 <div>
-                    <label className="block text-gray-700">Title</label>
+                    <label className="block text-gray-700 font-semibold mb-1">Title</label>
                     <input
-                        className="border p-2 rounded w-full"
+                        className="border p-2 rounded w-full focus:outline-none focus:border-blue-500"
                         type="text"
                         name="title"
                         value={formik.values.title}
@@ -57,106 +60,92 @@ const AddVideoForm = ({ onAdd, onEdit, video,  setShowForm }) => {
                         required
                     />
                     {formik.touched.title && formik.errors.title && (
-                        <div className="text-red-500 text-sm">{formik.errors.title}</div>
+                        <div className="text-red-500 text-sm mt-1">{formik.errors.title}</div>
                     )}
                 </div>
 
                 <div>
-                    <label className="block text-gray-700">Duration</label>
+                    <label className="block text-gray-700 font-semibold mb-1">Description</label>
+                    <textarea
+                        className="border p-2 rounded w-full focus:outline-none focus:border-blue-500"
+                        name="description"
+                        value={formik.values.description}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                    />
+                    {formik.touched.description && formik.errors.description && (
+                        <div className="text-red-500 text-sm mt-1">{formik.errors.description}</div>
+                    )}
+                </div>
+
+                <div>
+                    <label className="block text-gray-700 font-semibold mb-1">Category IDs (Comma Separated)</label>
                     <input
-                        className="border p-2 rounded w-full"
+                        className="border p-2 rounded w-full focus:outline-none focus:border-blue-500"
                         type="text"
-                        name="duration"
-                        value={formik.values.duration}
-                        onChange={formik.handleChange}
+                        name="categoryIds"
+                        value={formik.values.categoryIds.join(', ')}
+                        onChange={(e) =>
+                            formik.setFieldValue('categoryIds', e.target.value.split(',').map(id => id.trim()))
+                        }
                         onBlur={formik.handleBlur}
-                        required
                     />
-                    {formik.touched.duration && formik.errors.duration && (
-                        <div className="text-red-500 text-sm">{formik.errors.duration}</div>
+                    {formik.touched.categoryIds && formik.errors.categoryIds && (
+                        <div className="text-red-500 text-sm mt-1">{formik.errors.categoryIds}</div>
                     )}
                 </div>
 
                 <div>
-                    <label className="block text-gray-700">Size</label>
-                    <input
-                        className="border p-2 rounded w-full"
-                        type="text"
-                        name="size"
-                        value={formik.values.size}
+                    <label className="block text-gray-700 font-semibold mb-1">Enum Mode</label>
+                    <select
+                        className="border p-2 rounded w-full focus:outline-none focus:border-blue-500"
+                        name="enumMode"
+                        value={formik.values.enumMode}
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
-                        required
-                    />
-                    {formik.touched.size && formik.errors.size && (
-                        <div className="text-red-500 text-sm">{formik.errors.size}</div>
+                    >
+                        <option value="public">Public</option>
+                        <option value="private">Private</option>
+                    </select>
+                    {formik.touched.enumMode && formik.errors.enumMode && (
+                        <div className="text-red-500 text-sm mt-1">{formik.errors.enumMode}</div>
                     )}
                 </div>
 
                 <div>
-                    <label className="block text-gray-700">Quality</label>
+                    <label className="block text-gray-700 font-semibold mb-1">Thumbnail URL</label>
                     <input
-                        className="border p-2 rounded w-full"
-                        type="text"
-                        name="quality"
-                        value={formik.values.quality}
-                        onChange={formik.handleChange}
+                        className="border p-2 rounded w-full focus:outline-none focus:border-blue-500"
+                        type="file"
+                        name="thumbnailUrl"
+                        onChange={handleFileChange}
                         onBlur={formik.handleBlur}
-                        required
                     />
-                    {formik.touched.quality && formik.errors.quality && (
-                        <div className="text-red-500 text-sm">{formik.errors.quality}</div>
-                    )}
-                </div>
 
-                <div>
-                    <label className="block text-gray-700">Upload Time</label>
-                    <input
-                        className="border p-2 rounded w-full"
-                        type="datetime-local"
-                        name="upload_time"
-                        value={formik.values.upload_time ? formatDateForInput(formik.values.upload_time) : ''}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        required
-                    />
-                    {formik.touched.upload_time && formik.errors.upload_time && (
-                        <div className="text-red-500 text-sm">{formik.errors.upload_time}</div>
+                    {thumbnailPreview && (
+                        <img className="mt-4 w-32 h-32 object-cover rounded" crossOrigin="anonymous" src={thumbnailPreview} alt="" />
                     )}
-                </div>
-
-                <div>
-                    <label className="block text-gray-700">Video URL</label>
-                    <input
-                        className="border p-2 rounded w-full"
-                        type="text"
-                        name="url"
-                        value={formik.values.url}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        required
-                    />
-                    {formik.touched.url && formik.errors.url && (
-                        <div className="text-red-500 text-sm">{formik.errors.url}</div>
+                    {formik.touched.thumbnailUrl && formik.errors.thumbnailUrl && (
+                        <div className="text-red-500 text-sm mt-1">{formik.errors.thumbnailUrl}</div>
                     )}
                 </div>
             </div>
-            <div className="flex justify-end space-x-4 mt-3">
+
+            <div className="flex justify-end space-x-4 mt-6">
                 <button
                     type="button"
-                    onClick={()=>setShowForm(false)}
+                    onClick={() => setShowForm(false)}
                     className="w-1/4 bg-gray-300 text-gray-800 py-2 rounded-md hover:bg-gray-400 transition-all duration-200 shadow-md"
-                 >
-                    Hủy
+                >
+                    Cancel
                 </button>
                 <button
                     type="submit"
                     className="w-1/4 bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition-all duration-200 shadow-md"
-         >
-                    {isEditing ? 'Update Video' : 'Add Video'}
+                >
+                   Update Video
                 </button>
             </div>
-           
         </form>
     );
 };

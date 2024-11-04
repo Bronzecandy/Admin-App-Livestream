@@ -7,9 +7,13 @@ const VideoRow = ({ video, onEdit, onDelete, onPlay }) => {
 
     return (
         <tr key={video._id} className="hover:bg-gray-50 transition-colors duration-300 border-b">
-            <td className="px-6 py-4 text-gray-800 font-medium">{video.title}</td>
+            <td className="px-6 py-4 text-gray-800 font-medium">
+                {video.title.length > 30 ? `${video.title.substring(0, 30)}...` : video.title}
+            </td>
+
             <td className="px-6 py-4 text-gray-700">{video.description}</td>
-            <td className="px-6 py-4 text-gray-700">{video.videoUrl}</td>
+           
+            <td className="px-6 py-4 text-gray-700"> <img crossOrigin="anonymous" src={video.thumbnailUrl} alt="" /></td>
             <td className="px-6 py-4 text-gray-700">
                 {video.isUploaded ? (
                     <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
