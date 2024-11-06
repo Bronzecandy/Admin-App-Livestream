@@ -1,23 +1,41 @@
-import React, { useEffect, useState } from 'react';
+// src/components/VideoCategories/VideoCategories.jsx
+import React, { useState, useEffect } from 'react';
 import CategoryList from './CategoryList';
 import CategoryService from './CategoryService';
 
 const VideoCategories = () => {
   const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchCategories = async () => {
+    const authenticateAndFetchCategories = async () => {
       try {
-        const result = await CategoryService.getAllCategories();
-        setCategories(result.data || result); // Adjust if response wraps data
-      } catch (error) {
-        console.error("Error fetching categories:", error);
+        await CategoryService.login(); // Login and set the token
+        const data = await CategoryService.getAllCategories();
+        setCategories(data);
+      } catch (err) {
+        setError('Không thể lấy danh sách thể loại');
+        console.error('Error fetching categories:', err);
+      } finally {
+        setLoading(false);
       }
     };
-    fetchCategories();
+
+    authenticateAndFetchCategories();
   }, []);
 
-  return <CategoryList categories={categories} />;
+  return (
+    <div>
+      {loading ? (
+        <div>Loading...</div>
+      ) : error ? (
+        <div>{error}</div>
+      ) : (
+        <CategoryList categories={categories} />
+      )}
+    </div>
+  );
 };
 
 export default VideoCategories;
