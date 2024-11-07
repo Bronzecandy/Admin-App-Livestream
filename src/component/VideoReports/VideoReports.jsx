@@ -13,6 +13,9 @@ import {
   Area,
   AreaChart
 } from 'recharts';
+import StatCard from './Statcard';
+import LoadingSpinner from './LoadingSpinner';
+import NewUsersStats from './NewUsersStats';
 
 // Mock data generator with real days data
 const generateMockData = (days = 30) => {
@@ -43,14 +46,6 @@ const generateMockData = (days = 30) => {
   return data;
 };
 
-// Mock user data
-const mockUserData = [
-  { id: 1, username: "Nguyễn Văn Sơn", loginCount: 45, onlineTime: "12h 30m", lastActive: "2024-03-15" },
-  { id: 2, username: "Trần Ngọc Thành Nam", loginCount: 32, onlineTime: "8h 45m", lastActive: "2024-03-18" },
-  { id: 3, username: "Đỗ Văn Minh Quân", loginCount: 28, onlineTime: "6h 20m", lastActive: "2024-05-20" },
-  { id: 4, username: "Trần Chí Công", loginCount: 56, onlineTime: "15h 10m", lastActive: "2024-07-23" },
-];
-
 // Mock video data
 const mockVideoData = [
   { id: 1, title: "Live Gaming Session", views: 1200, likes: 450, comments: 89, duration: "1:30:00" },
@@ -59,32 +54,7 @@ const mockVideoData = [
   { id: 4, title: "Tech Review", views: 1500, likes: 560, comments: 92, duration: "25:00" },
 ];
 
-// Stat Card Component
-const StatCard = ({ icon: Icon, title, value, className }) => (
-  <div className={`p-6 rounded-lg shadow-md bg-white ${className}`}>
-    <div className="flex items-center justify-between">
-      <div>
-        <p className="text-sm text-gray-600">{title}</p>
-        <h3 className="text-2xl font-bold mt-1">{value.toLocaleString()}</h3>
-      </div>
-      <div className="p-3 rounded-full bg-blue-100">
-        <Icon className="w-6 h-6 text-blue-600" />
-      </div>
-    </div>
-  </div>
-);
-
-const LoadingSpinner = () => (
-  <div className="bg-white h-full w-full flex justify-center items-center min-h-[400px]">
-    <div className="flex flex-col items-center">
-      <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-      <span className="mt-4 text-gray-600">Loading...</span>
-    </div>
-  </div>
-);
-
 const VideoReport = () => {
-  const [timeRange, setTimeRange] = useState('30d');
   const [analyticsData, setAnalyticsData] = useState([]);
   const [activeTab, setActiveTab] = useState('views');
   const [loading, setLoading] = useState(true);
@@ -96,8 +66,7 @@ const VideoReport = () => {
       try {
         // Simulate API call with delay
         await new Promise(resolve => setTimeout(resolve, 1500));
-        const days = timeRange === '7d' ? 7 : timeRange === '30d' ? 30 : 90;
-        setAnalyticsData(generateMockData(days));
+        setAnalyticsData(generateMockData(90));
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
@@ -106,7 +75,7 @@ const VideoReport = () => {
     };
 
     fetchData();
-  }, [timeRange]);
+  }, []);
 
   const handleTabChange = (tab) => {
     setLoading(true);
@@ -117,18 +86,18 @@ const VideoReport = () => {
     }, 1000);
   };
 
-  const timeRangeButtons = [
-    { value: '7d', label: '7 Days' },
-    { value: '30d', label: '30 Days' },
-    { value: '90d', label: '90 Days' },
-  ];
-
   const tabs = [
     { value: 'views', label: 'Views & Engagement' },
     { value: 'revenue', label: 'Revenue' },
     { value: 'users', label: 'User Activity' },
     { value: 'videos', label: 'Video Performance' },
+    { value: 'streams', label: 'Stream Performance' },
   ];
+
+  const totalViews = analyticsData.reduce((sum, day) => sum + day.views, 0);
+  const totalLikes = analyticsData.reduce((sum, day) => sum + day.likes, 0);
+  const totalActiveUsers = analyticsData[analyticsData.length - 1]?.activeUsers || 0;
+  const totalNewVideos = analyticsData.reduce((sum, day) => sum + day.newVideos, 0);
 
   const totalRevenue = analyticsData.reduce((sum, day) => sum + day.totalRevenue, 0);
   const totalAdsRevenue = analyticsData.reduce((sum, day) => sum + day.adsRevenue, 0);
@@ -139,21 +108,6 @@ const VideoReport = () => {
     <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <h1 className="text-3xl font-bold text-gray-800">Video Analytics Dashboard</h1>
-        <div className="flex space-x-2">
-          {timeRangeButtons.map(({ value, label }) => (
-            <button
-              key={value}
-              onClick={() => setTimeRange(value)}
-              className={`px-4 py-2 rounded-lg transition-colors ${
-                timeRange === value
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-white text-gray-600 hover:bg-gray-100'
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
       </div>
 
       {/* Main content with loading state */}
@@ -162,26 +116,26 @@ const VideoReport = () => {
       ) : (
         <>
           {/* Stat Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <StatCard
               icon={FiEye}
               title="Total Views"
-              value={analyticsData.reduce((sum, day) => sum + day.views, 0)}
+              value={totalViews}
             />
             <StatCard
               icon={FiHeart}
               title="Total Likes"
-              value={analyticsData.reduce((sum, day) => sum + day.likes, 0)}
+              value={totalLikes}
             />
             <StatCard
               icon={FiUsers}
               title="Active Users"
-              value={analyticsData[analyticsData.length - 1]?.activeUsers || 0}
+              value={totalActiveUsers}
             />
             <StatCard
               icon={FiVideo}
               title="New Videos"
-              value={analyticsData.reduce((sum, day) => sum + day.newVideos, 0)}
+              value={totalNewVideos}
             />
           </div>
 
@@ -241,7 +195,7 @@ const VideoReport = () => {
                     <p className="text-xl font-bold">${totalRevenue.toFixed(2)}</p>
                   </div>
                 </div>
-                
+
                 <div className="h-[400px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={analyticsData}>
@@ -261,22 +215,30 @@ const VideoReport = () => {
 
             {activeTab === 'users' && (
               <div className="overflow-x-auto">
+                <NewUsersStats />
+              </div>
+            )}
+
+            {activeTab === 'videos' && (
+              <div className="overflow-x-auto">
                 <table className="w-full whitespace-nowrap">
                   <thead>
                     <tr className="bg-gray-50">
-                      <th className="text-left p-4 font-semibold text-gray-600">Username</th>
-                      <th className="text-left p-4 font-semibold text-gray-600">Login Count</th>
-                      <th className="text-left p-4 font-semibold text-gray-600">Online Time</th>
-                      <th className="text-left p-4 font-semibold text-gray-600">Last Active</th>
+                      <th className="text-left p-4 font-semibold text-gray-600">Title</th>
+                      <th className="text-left p-4 font-semibold text-gray-600">Views</th>
+                      <th className="text-left p-4 font-semibold text-gray-600">Likes</th>
+                      <th className="text-left p-4 font-semibold text-gray-600">Comments</th>
+                      <th className="text-left p-4 font-semibold text-gray-600">Duration</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {mockUserData.map(user => (
-                      <tr key={user.id} className="border-b border-gray-200 hover:bg-gray-50">
-                        <td className="p-4">{user.username}</td>
-                        <td className="p-4">{user.loginCount}</td>
-                        <td className="p-4">{user.onlineTime}</td>
-                        <td className="p-4">{user.lastActive}</td>
+                    {mockVideoData.map(video => (
+                      <tr key={video.id} className="border-b border-gray-200 hover:bg-gray-50">
+                        <td className="p-4">{video.title}</td>
+                        <td className="p-4">{video.views}</td>
+                        <td className="p-4">{video.likes}</td>
+                        <td className="p-4">{video.comments}</td>
+                        <td className="p-4">{video.duration}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -284,7 +246,7 @@ const VideoReport = () => {
               </div>
             )}
 
-            {activeTab === 'videos' && (
+            {activeTab === 'streams' && (
               <div className="overflow-x-auto">
                 <table className="w-full whitespace-nowrap">
                   <thead>
