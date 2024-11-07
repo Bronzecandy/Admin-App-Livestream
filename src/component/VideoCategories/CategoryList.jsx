@@ -1,18 +1,19 @@
 import React, { useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import CategoryForm from './CategoryForm';
+import CategoryService from './CategoryService';
 
 const CategoryList = ({ categories: initialCategories }) => {
   const itemsPerPage = 5;
   const [currentPage, setCurrentPage] = useState(1);
-  const [categories, setCategories] = useState(initialCategories);
+  const [categories, setCategories] = useState(initialCategories || []);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredCategories = useMemo(() => {
     return categories.filter(category =>
-      category.name.toLowerCase().includes(searchTerm.toLowerCase())
+      category && category.name && category.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [categories, searchTerm]);
 
@@ -46,6 +47,14 @@ const CategoryList = ({ categories: initialCategories }) => {
     setIsFormOpen(true);
   };
 
+  const fetchCategories = async () => {
+    try {
+      const data = await CategoryService.getAllCategories();
+      setCategories(data);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+    }
+  };
   const handleFormSuccess = (formData) => {
     if (selectedCategory) {
       setCategories(prevCategories => 
@@ -61,6 +70,7 @@ const CategoryList = ({ categories: initialCategories }) => {
       };
       setCategories(prevCategories => [...prevCategories, newCategory]);
     }
+    fetchCategories();
     setIsFormOpen(false);
   };
 
@@ -235,6 +245,7 @@ const CategoryList = ({ categories: initialCategories }) => {
         category={selectedCategory}
         onClose={() => setIsFormOpen(false)}
         onSuccess={handleFormSuccess}
+        onRefresh={fetchCategories}
       />
     </div>
   );

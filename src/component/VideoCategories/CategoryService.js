@@ -1,7 +1,7 @@
 // src/services/CategoryService.js
 
 const API_URL = import.meta.env.VITE_API_URL;
-let token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzFhMTRmNDZkMDUwODg0MjNlZWFiOTEiLCJpcCI6Ijo6MSIsImlhdCI6MTczMDQ2MDgxN30._dqyZS4blv-60Ii18LOfGNzkutur_fXJy80H1NKJyRE';
+let token = '';
 
 const handleResponse = async (response) => {
   const data = await response.json();
