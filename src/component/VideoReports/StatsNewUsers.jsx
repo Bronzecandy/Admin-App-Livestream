@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import {
     BarChart,
     Bar,
@@ -11,6 +10,7 @@ import {
 } from "recharts";
 import StatCard from "./Statcard";
 import LoadingSpinner from "./LoadingSpinner";
+import VideoServices from "./VideoServices";
 
 const NewUsersStats = () => {
     const [loading, setLoading] = useState(true);
@@ -23,26 +23,14 @@ const NewUsersStats = () => {
         monthly: [],
     });
 
-    const API_URL =
-        "https://social-media-z5a2.onrender.com/api/statistics/users/new";
-    const TOKEN =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzFhMTRmNDZkMDUwODg0MjNlZWFiOTEiLCJpcCI6Ijo6MSIsImlhdCI6MTczMDQ2MDgxN30._dqyZS4blv-60Ii18LOfGNzkutur_fXJy80H1NKJyRE";
-
     useEffect(() => {
         const fetchNewUsersData = async () => {
             try {
-                const response = await axios.get(API_URL, {
-                    headers: {
-                        Authorization: `Bearer ${TOKEN}`,
-                        "Content-Type": "application/json",
-                    },
-                });
-                setNewUsersData(response.data.newUsers);
+                const data = await VideoServices.getNewUsersStats();
+                setNewUsersData(data.newUsers);
             } catch (error) {
-                console.error("Error fetching new users data:", error);
-                setErrorMessage(
-                    "Error fetching new users data. Please try again later."
-                );
+                console.error('Error fetching new users data:', error);
+                setErrorMessage('Error fetching new users data. Please try again later.');
                 setError(true);
             } finally {
                 setLoading(false);
