@@ -36,6 +36,19 @@ const CategoryService = {
     }
   },
 
+  getCategoryById: async (categoryId) => {
+    try {
+      const response = await fetch(`${API_URL}/api/categories/${categoryId}`, {
+        headers: getHeaders(),
+        method: "GET",
+      });
+      return await handleResponse(response);
+    } catch (error) {
+      console.error("Error fetching category:", error);
+      throw new Error("Không thể lấy thông tin thể loại");
+    }
+  },
+
   createCategory: async (categoryData) => {
     try {
       const response = await fetch(`${API_URL}/api/categories`, {
