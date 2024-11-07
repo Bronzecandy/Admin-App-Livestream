@@ -15,7 +15,7 @@ import {
 } from 'recharts';
 import StatCard from './Statcard';
 import LoadingSpinner from './LoadingSpinner';
-import NewUsersStats from './NewUsersStats';
+import NewUsersStats from './StatsNewUsers';
 
 // Mock data generator with real days data
 const generateMockData = (days = 30) => {
