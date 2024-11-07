@@ -16,6 +16,7 @@ import {
 import StatCard from './Statcard';
 import LoadingSpinner from './LoadingSpinner';
 import NewUsersStats from './StatsNewUsers';
+import StatsRevenue from './StatsRevenue';
 
 // Mock data generator with real days data
 const generateMockData = (days = 30) => {
@@ -99,11 +100,6 @@ const VideoReport = () => {
   const totalActiveUsers = analyticsData[analyticsData.length - 1]?.activeUsers || 0;
   const totalNewVideos = analyticsData.reduce((sum, day) => sum + day.newVideos, 0);
 
-  const totalRevenue = analyticsData.reduce((sum, day) => sum + day.totalRevenue, 0);
-  const totalAdsRevenue = analyticsData.reduce((sum, day) => sum + day.adsRevenue, 0);
-  const totalSubscriptionRevenue = analyticsData.reduce((sum, day) => sum + day.subscriptionRevenue, 0);
-  const totalDonationRevenue = analyticsData.reduce((sum, day) => sum + day.donationRevenue, 0);
-
   return (
     <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -177,39 +173,7 @@ const VideoReport = () => {
 
             {activeTab === 'revenue' && (
               <div className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                  <div className="p-4 bg-blue-50 rounded-lg">
-                    <h3 className="text-sm text-blue-600">Ads Revenue</h3>
-                    <p className="text-xl font-bold">${totalAdsRevenue.toFixed(2)}</p>
-                  </div>
-                  <div className="p-4 bg-green-50 rounded-lg">
-                    <h3 className="text-sm text-green-600">Subscription Revenue</h3>
-                    <p className="text-xl font-bold">${totalSubscriptionRevenue.toFixed(2)}</p>
-                  </div>
-                  <div className="p-4 bg-purple-50 rounded-lg">
-                    <h3 className="text-sm text-purple-600">Donation Revenue</h3>
-                    <p className="text-xl font-bold">${totalDonationRevenue.toFixed(2)}</p>
-                  </div>
-                  <div className="p-4 bg-gray-50 rounded-lg">
-                    <h3 className="text-sm text-gray-600">Total Revenue</h3>
-                    <p className="text-xl font-bold">${totalRevenue.toFixed(2)}</p>
-                  </div>
-                </div>
-
-                <div className="h-[400px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={analyticsData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="date" />
-                      <YAxis />
-                      <Tooltip />
-                      <Legend />
-                      <Area type="monotone" dataKey="adsRevenue" stackId="1" stroke="#3B82F6" fill="#3B82F6" name="Ads" />
-                      <Area type="monotone" dataKey="subscriptionRevenue" stackId="1" stroke="#10B981" fill="#10B981" name="Subscriptions" />
-                      <Area type="monotone" dataKey="donationRevenue" stackId="1" stroke="#8B5CF6" fill="#8B5CF6" name="Donations" />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </div>
+                <StatsRevenue />
               </div>
             )}
 

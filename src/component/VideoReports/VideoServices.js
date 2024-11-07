@@ -1,7 +1,7 @@
-import axios from 'axios';
+import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL;
-let token = '';
+let token = "";
 
 const VideoServices = {
     login: async () => {
@@ -12,16 +12,41 @@ const VideoServices = {
     getNewUsersStats: async () => {
         try {
             await VideoServices.login();
-            const response = await axios.get(`${API_URL}/api/statistics/users/new`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
+            const response = await axios.get(
+                `${API_URL}/api/statistics/users/new`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
                 }
-            });
+            );
             return response.data;
         } catch (error) {
-            console.error('Error fetching new users data:', error);
-            throw new Error('Unable to get new user information');
+            console.error("Error fetching new users data:", error);
+            throw new Error("Unable to get new user information");
+        }
+    },
+
+    getRevenueStats: async (year) => {
+        try {
+            await VideoServices.login();
+            const response = await axios.get(
+                `${API_URL}/api/statistics/revenue`,
+                {
+                    params: {
+                        year: year
+                    },
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+            return response.data;
+        } catch (error) {
+            console.error("Error fetching revenue data:", error);
+            throw new Error("Unable to get revenue information");
         }
     },
 };

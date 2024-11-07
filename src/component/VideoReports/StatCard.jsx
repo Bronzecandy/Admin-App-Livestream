@@ -10,6 +10,14 @@ const StatCard = ({ icon: Icon, title, value, className }) => {
     bgColor = 'bg-green-100';
   } else if (title === 'This month') {
     bgColor = 'bg-yellow-100';
+  } else if (title === 'Today Revenue') {
+    bgColor = 'bg-blue-100';
+  } else if (title === 'This Week Revenue') {
+    bgColor = 'bg-green-100';
+  } else if (title === 'This Month Revenue') {
+    bgColor = 'bg-purple-100';
+  } else if (title === 'Total Revenue') {
+    bgColor = 'bg-gray-100';
   }
 
   return (
