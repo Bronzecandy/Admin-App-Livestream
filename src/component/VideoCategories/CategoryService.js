@@ -24,7 +24,7 @@ const CategoryService = {
 
   getAllCategories: async () => {
     try {
-      const response = await fetch(`${API_URL}/api/categories`, {
+      const response = await fetch(`http://localhost:5173/api/categories`, {
         headers: getHeaders(),
         method: "GET",
       });

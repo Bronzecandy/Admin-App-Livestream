@@ -190,7 +190,7 @@ const CategoryList = ({ categories: initialCategories }) => {
               <th className="text-left py-4 px-2 w-24">Image</th>
               <th className="text-left py-4 px-2 w-1/3">Name</th>
               <th className="text-left py-4 px-2 w-1/4">Date Created</th>
-              <th className="text-right py-4 px-2 w-32">Actions</th>
+              <th className="text-right py-4 px-12 w-32">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -199,7 +199,7 @@ const CategoryList = ({ categories: initialCategories }) => {
                 <td className="py-4 px-2">
                   <div className="w-12 h-12">
                     <img 
-                      src={category.imageUrl} 
+                      src={`http://localhost:5173/${category.imageUrl?.split('/').slice(3).join("/")}`} 
                       alt={category.name}
                       className="w-full h-full object-cover rounded"
                     />
@@ -300,13 +300,14 @@ const CategoryList = ({ categories: initialCategories }) => {
                 {/* Image Section */}
                 {selectedCategoryDetails.category.imageUrl && 
                 selectedCategoryDetails.category.imageUrl !== "https://social-media-z5a2.onrender.com/null" ? (
-                  <div className="relative">
+                  <div className="relative mx-auto w-[400px] h-[330px]">
                     <img 
-                      src={selectedCategoryDetails.category.imageUrl} 
+                      src={`http://localhost:5173/${selectedCategoryDetails.category.imageUrl?.split('/').slice(3).join("/")}`}
+                      
                       alt={selectedCategoryDetails.category.name}
-                      className="w-full h-64 object-cover rounded-xl shadow-sm"
+                      className="absolute w-full h-full object-cover rounded-xl shadow-sm"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent rounded-xl"></div>
+                    <div className="absolute object-contain w-full h-full inset-0 bg-gradient-to-t from-black/30 to-transparent rounded-xl"></div>
                   </div>
                 ) : (
                   <div className="bg-gray-100 h-64 rounded-xl flex items-center justify-center">
@@ -315,6 +316,7 @@ const CategoryList = ({ categories: initialCategories }) => {
                     </svg>
                   </div>
                 )}
+
 
                 {/* Info Grid */}
                 <div className="grid grid-cols-2 gap-6">

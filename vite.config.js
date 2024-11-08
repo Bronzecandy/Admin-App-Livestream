@@ -9,7 +9,13 @@ export default defineConfig({
       '/api': {
         target: 'https://social-media-z5a2.onrender.com',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
+        rewrite: (path) => path.replace(/^\/api/, '/api'),
+        secure: false
+      },
+      '/assets': {
+        target: 'https://social-media-z5a2.onrender.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/assets/, '/assets'),
         secure: false
       }
     }
