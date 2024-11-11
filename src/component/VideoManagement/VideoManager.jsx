@@ -19,6 +19,7 @@ const VideoManager = () => {
     const [title, setTitle] = useState('');
     const [enumMode, setEnumMode] = useState('');
     const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzFhMTRmNDZkMDUwODg0MjNlZWFiOTEiLCJpcCI6Ijo6MSIsImlhdCI6MTczMDQ2MDgxN30._dqyZS4blv-60Ii18LOfGNzkutur_fXJy80H1NKJyRE';
+    localStorage.setItem('token', token);
     useEffect(() => {
         console.log(title,
             enumMode,
@@ -203,7 +204,7 @@ const VideoManager = () => {
                         {videos.length > 0 ? (
                             videos.map((video) => (
                                 <VideoRow
-                                    key={video._id}
+                                    key={video._id }
                                     video={video}
                                     onEdit={() => openEditForm(video)}
                                     onDelete={deleteVideo}
@@ -240,20 +241,21 @@ const VideoManager = () => {
                         >
                             Previous
                         </button>
-                        {pages
-                            .filter(p => Math.abs(p - page) <= 2 || p === 1 || p === totalPages) // Hiển thị trang đầu, cuối và các trang gần trang hiện tại
-                            .map((p, index, array) => (
-                                <>
-                                    {index > 0 && p - array[index - 1] > 1 && <span key={`ellipsis-${p}`} className="px-2">...</span>}
-                                    <button
-                                        key={p}
-                                        onClick={() => setPage(p)}
-                                        className={`px-3 py-1 rounded-lg ${p === page ? 'bg-blue-600 text-white' : 'border hover:bg-gray-50'}`}
-                                    >
-                                        {p}
-                                    </button>
-                                </>
-                            ))
+                        {
+                            pages
+                                .filter(p => Math.abs(p - page) <= 2 || p === 1 || p === totalPages)
+                                .map((p, index, array) => (
+                                    <div key={`page-group-${p}-${index}`} className="flex items-center">
+                                        {index > 0 && p - array[index - 1] > 1 && <span key={`ellipsis-${index}`} className="px-2">...</span>}
+                                        <button
+                                            key={`page-${p}`}
+                                            onClick={() => setPage(p)}
+                                            className={`px-3 py-1 rounded-lg ${p === page ? 'bg-blue-600 text-white' : 'border hover:bg-gray-50'}`}
+                                        >
+                                            {p}
+                                        </button>
+                                    </div>
+                                ))
                         }
 
                         <button
