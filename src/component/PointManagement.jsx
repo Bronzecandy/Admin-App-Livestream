@@ -135,8 +135,8 @@ export default function RewardPointManager() {
               <tr className="bg-gray-100">
                 <th className="w-1/4 py-2 px-4 border-b text-left">Streamer</th>
                 <th className="w-1/4 py-2 px-4 border-b text-left">Points</th>
-                <th className="w-1/4 py-2 px-4 border-b text-center">Live Duration</th>
-                <th className="w-1/4 py-2 px-4 border-b text-center">Actions</th>
+                {/* <th className="w-1/4 py-2 px-4 border-b text-center">Live Duration</th>
+                <th className="w-1/4 py-2 px-4 border-b text-center">Actions</th> */}
               </tr>
             </thead>
             <tbody>
@@ -154,17 +154,17 @@ export default function RewardPointManager() {
                       {account.point !== undefined ? account.point : 'None'}
                     </div>
                   </td>
-                  <td className="py-2 px-4 border-b">
-                    {/* {account.isLive && (
+                  {/* <td className="py-2 px-4 border-b">
+                    {account.isLive && (
                       <div className="flex items-center justify-center">
                         <FaClock className="mr-2 text-green-500" />
                         {formatDuration(account.liveStartTime)}
                       </div>
-                    )} */}
+                    )}
                     <p className='flex items-center justify-center'>None</p>
-                  </td>
-                  <td className="py-2 px-4 border-b flex justify-center">
-                    {/* <button
+                  </td> */}
+                  {/* <td className="py-2 px-4 border-b flex justify-center">
+                    <button
                       onClick={() => toggleLivestream(account)}
                       className={`flex items-center justify-center w-full sm:w-auto px-4 py-2 rounded-md transition duration-300 ${
                         account.isLive
@@ -174,9 +174,9 @@ export default function RewardPointManager() {
                     >
                       {account.isLive ? <FaStop className="mr-2" /> : <FaPlay className="mr-2" />}
                       {account.isLive ? 'End Stream' : 'Start Stream'}
-                    </button> */}
+                    </button>
                     None
-                  </td>
+                  </td> */}
                 </tr>
               ))}
             </tbody>
