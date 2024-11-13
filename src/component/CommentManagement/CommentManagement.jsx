@@ -1,211 +1,187 @@
-// CommentManagement.jsx
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import CommentTable from './CommentTable';
 
 const CommentManagement = () => {
-    const [comments, setComments] = useState([]);
+    const [videos, setVideos] = useState([]);
+    const [comments, setComments] = useState({});
     const [filteredComments, setFilteredComments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [selectedComment, setSelectedComment] = useState(null);
-    const [statusFilter, setStatusFilter] = useState('all');
-    const [streamIdFilter, setStreamIdFilter] = useState('all');
-    const [commentToDelete, setCommentToDelete] = useState(null);
+    const [selectedVideo, setSelectedVideo] = useState(null);
 
-    const sensitiveWords = ['offensive', 'swearing', 'stupid', 'crazy', 'bullshit', 'fuck', "ngu"];
+    const [selectedStatus, setSelectedStatus] = useState('');
+    const [selectedVideoId, setSelectedVideoId] = useState('');
 
-    // Gọi API để lấy dữ liệu khi component được tải
+    const sensitiveWords = ['offensive', 'swearing', 'stupid', 'crazy', 'bullshit', 'fuck', 'to la', 'ngu'];
+    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzFhMTRmNDZkMDUwODg0MjNlZWFiOTEiLCJpcCI6Ijo6MSIsImlhdCI6MTczMDQ2MDgxN30._dqyZS4blv-60Ii18LOfGNzkutur_fXJy80H1NKJyRE';
+
     useEffect(() => {
-        axios.get('https://671894f07fc4c5ff8f4a0d5d.mockapi.io/api/cmt')
-            .then((response) => {
-                const updatedComments = response.data.map(comment => {
-                    const isSensitive = sensitiveWords.some(word => comment.comment.toLowerCase().includes(word));
-                    return { ...comment, status: isSensitive ? 'rejected' : 'approved' };
-                });
+        fetchVideos();
+    }, [token]);
 
-                setComments(updatedComments);
-                setFilteredComments(updatedComments);
-                setLoading(false);
-            })
-            .catch((error) => {
-                setError('Error fetching comments.');
-                setLoading(false);
+    const fetchVideos = async () => {
+        try {
+            const response = await axios.get('https://social-media-z5a2.onrender.com/api/videos/?size=100&page=1&sortBy=date&order=descending', {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
             });
-    }, []);
+            setVideos(response.data.videos);
 
-    // Hàm để thay đổi trạng thái lọc
-    const handleFilterChange = (event) => {
-        const value = event.target.value;
-        setStatusFilter(value);
-        filterComments(value, streamIdFilter);
-    };
+            const commentsPromises = response.data.videos.map(video => fetchCommentsForVideo(video._id, video.title));
+            const allComments = await Promise.all(commentsPromises);
 
-    // Hàm để thay đổi ID buổi live stream
-    const handleStreamIdChange = (event) => {
-        const value = event.target.value;
-        setStreamIdFilter(value);
-        filterComments(statusFilter, value);
-    };
-
-    // Hàm lọc bình luận theo trạng thái và liveStreamId
-    const filterComments = (status, streamId) => {
-        const filtered = comments.filter(comment => {
-            const matchesStatus = status === 'all' || comment.status === status;
-            const matchesStreamId = streamId === 'all' || comment.liveStreamId.toString() === streamId;
-            return matchesStatus && matchesStreamId;
-        });
-        setFilteredComments(filtered);
-    };
-
-    // Hàm mở modal xác nhận khi nhấn xóa
-    const openDeleteModal = (comment) => {
-        setCommentToDelete(comment);
-    };
-
-    // Hàm đóng modal xác nhận
-    const closeDeleteModal = () => {
-        setCommentToDelete(null);
-    };
-
-    // Hàm xóa bình luận
-    const handleDeleteComment = (id) => {
-        if (!id) return;
-        axios.delete(`https://671894f07fc4c5ff8f4a0d5d.mockapi.io/api/cmt/${id}`)
-            .then(() => {
-                setComments(comments.filter(comment => comment.id !== id));
-                setFilteredComments(filteredComments.filter(comment => comment.id !== id));
-                closeDeleteModal();
-                alert('Comment deleted successfully.');
-            })
-            .catch((error) => {
-                console.error('Error deleting comment:', error);
-                alert('An error occurred while deleting the comment.');
-            });
-    };
-
-    // Hàm hiển thị modal chi tiết bình luận
-    const handleViewComment = (comment) => {
-        setSelectedComment(comment);
-    };
-
-    // Hàm đóng modal
-    const closeModal = () => {
-        setSelectedComment(null);
-    };
-
-    // Hàm để trả về class dựa trên trạng thái
-    const getStatusClass = (status) => {
-        switch (status) {
-            case 'approved':
-                return 'bg-green-100 text-green-800';
-            case 'rejected':
-                return 'bg-red-100 text-red-800';
-            default:
-                return 'bg-gray-100 text-gray-800';
+            const mergedComments = allComments.flat();
+            setComments(prevComments => ({
+                ...prevComments,
+                ...Object.fromEntries(response.data.videos.map((video, index) => [video._id, allComments[index]]))
+            }));
+            setFilteredComments(mergedComments);
+            setLoading(false);
+        } catch (error) {
+            console.error('Error fetching videos or comments:', error);
+            setError('Error fetching videos or comments');
+            setLoading(false);
         }
     };
 
-    // Lấy danh sách unique liveStreamId
-    const uniqueStreamIds = [...new Set(comments.map(comment => comment.liveStreamId))];
+    const fetchCommentsForVideo = async (videoId, videoTitle) => {
+        try {
+            const response = await axios.get(`https://social-media-z5a2.onrender.com/api/comments/video/${videoId}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            return response.data.comments.map(comment => {
+                const isSensitive = sensitiveWords.some(word => comment.content.toLowerCase().includes(word));
+                return { ...comment, status: isSensitive ? 'rejected' : 'approved', videoId, videoTitle };
+            });
+        } catch (error) {
+            console.error('Error fetching comments for video:', videoId, error);
+            return [];
+        }
+    };
 
-    if (loading) {
-        return <p>Loading comments...</p>; // Hiển thị khi đang tải dữ liệu
-    }
+    const handleViewComment = (comment) => {
+        setSelectedComment(comment);
+        const relatedVideo = videos.find(video => video._id === comment.videoId);
+        setSelectedVideo(relatedVideo);
+    };
 
-    if (error) {
-        return <p>{error}</p>; // Hiển thị lỗi nếu có
-    }
+    const closeModal = () => {
+        setSelectedComment(null);
+        setSelectedVideo(null);
+    };
+
+    const handleStatusChange = (e) => {
+        setSelectedStatus(e.target.value);
+        applyFilters(e.target.value, selectedVideoId);
+    };
+
+    const handleVideoChange = (e) => {
+        setSelectedVideoId(e.target.value);
+        applyFilters(selectedStatus, e.target.value);
+    };
+
+    const applyFilters = (status, videoId) => {
+        const filtered = Object.values(comments)
+            .flat()
+            .filter(comment => 
+                (status ? comment.status === status : true) && 
+                (videoId ? comment.videoId === videoId : true)
+            );
+        setFilteredComments(filtered);
+    };
+
+    const refreshComments = async () => {
+        setLoading(true);
+        await fetchVideos();
+    };
+
+    if (loading) return <p>Loading videos and comments...</p>;
+    if (error) return <p>{error}</p>;
 
     return (
         <div className="container mx-auto mt-8 p-5 bg-gray-100 shadow-lg rounded-lg">
-             <div className="flex items-center justify-between mb-6">
-          <h1 className="text-3xl font-semibold">Comments</h1>
-          <div className="flex items-center space-x-4">
-            <nav className="text-sm">
-              <span className="text-gray-500">Dashboard</span>
-              <span className="mx-2">/</span>
-              <span>Comments</span>
-            </nav>
-          </div>
-        </div>
-            {/* Dropdown để lọc bình luận theo trạng thái và liveStreamId */}
-            <div className="mb-4 flex justify-between">
-                <div className="w-1/2 mr-2">
-                    <label htmlFor="statusFilter" className="mr-2 text-gray-600 font-semibold text-lg">Status</label>
-                    <select
-                        id="statusFilter"
-                        value={statusFilter}
-                        onChange={handleFilterChange}
-                        className="border border-blue-300 text-blue-500 font-semibold text-lg px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 hover:border-blue-700 hover:text-blue-700 w-full"
-                    >
-                        <option value="all" className="text-gray-700">All</option>
-                        <option value="approved">Approved</option>
-                        <option value="rejected">Rejected</option>
-                    </select>
-                </div>
-                <div className="w-1/2 ml-2">
-                    <label htmlFor="streamIdFilter" className="mr-2 text-gray-600 font-semibold text-lg">Live Stream ID</label>
-                    <select
-                        id="streamIdFilter"
-                        value={streamIdFilter}
-                        onChange={handleStreamIdChange}
-                        className="border border-blue-300 text-blue-500 font-semibold text-lg px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 hover:border-blue-700 hover:text-blue-700 w-full"
-                    >
-                        <option value="all" className="text-gray-700">All</option>
-                        {uniqueStreamIds.map(streamId => (
-                            <option key={streamId} value={streamId}>{streamId}</option>
-                        ))}
-                    </select>
-                </div>
+            <div className="flex items-center justify-between mb-6">
+                <h1 className="text-3xl font-semibold">Comments</h1>
             </div>
+
+            <div className="flex gap-4 mb-4">
+    <select
+        value={selectedStatus}
+        onChange={handleStatusChange}
+        className="w-full border p-2 rounded-lg bg-white shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+    >
+        <option value="">All Statuses</option>
+        <option value="approved">Approved</option>
+        <option value="rejected">Rejected</option>
+    </select>
+
+    <select
+        value={selectedVideoId}
+        onChange={handleVideoChange}
+        className="w-full border p-2 rounded-lg bg-white shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+    >
+        <option value="">All Videos</option>
+        {videos.map(video => (
+            <option key={video._id} value={video._id}>{video.title}</option>
+        ))}
+    </select>
+</div>
+
 
             <CommentTable
                 filteredComments={filteredComments}
                 handleViewComment={handleViewComment}
-                openDeleteModal={openDeleteModal}
-                getStatusClass={getStatusClass}
+                getStatusClass={(status) => (status === 'approved' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800')}
+                refreshComments={refreshComments}
             />
 
-            {/* Hiển thị Modal nếu có bình luận được chọn */}
-            {selectedComment && (
+            {selectedComment && selectedVideo && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-                    <div className="bg-white p-6 rounded-lg shadow-lg w-1/2">
-                        <h3 className="text-xl font-semibold mb-4">Comment Details</h3>
-                        <p><strong>Username:</strong> {selectedComment.username}</p>
-                        <p><strong>Content:</strong> {selectedComment.comment}</p>
-                        <p><strong>Status:</strong> {selectedComment.status}</p>
-                        <p><strong>Time:</strong> {new Date(selectedComment.timestamp).toLocaleString()}</p>
-                        <p><strong>Live Stream ID:</strong> {selectedComment.liveStreamId}</p>
+                    <div className="relative bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl h-4/5 overflow-y-auto">
                         <button
-                            className="mt-4 bg-red-500 text-white px-4 py-2 rounded shadow"
                             onClick={closeModal}
+                            className="absolute top-4 right-4 text-gray-600 hover:text-gray-800 focus:outline-none"
                         >
-                            Close
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
                         </button>
-                    </div>
-                </div>
-            )}
+                        <h3 className="text-2xl font-bold text-gray-800 mb-4 border-b pb-2">Comment and Video Details</h3>
 
-            {/* Hiển thị Modal xác nhận xóa */}
-            {commentToDelete && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-                    <div className="bg-white p-6 rounded-lg shadow-lg w-1/3">
-                        <h3 className="text-xl font-semibold mb-4">Confirm Delete Comment</h3>
-                        <p>Are you sure you want to delete the comment from user <strong>{commentToDelete.username}</strong>?</p>
-                        <div className="mt-6 flex justify-end space-x-4">
-                            <button
-                                className="bg-gray-300 text-gray-800 px-4 py-2 rounded shadow"
-                                onClick={closeDeleteModal}
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                className="bg-red-500 text-white px-4 py-2 rounded shadow"
-                                onClick={() => handleDeleteComment(commentToDelete.id)}
-                            >
-                                Confirm Delete
-                            </button>
+                        <div className="space-y-4">
+                            <div className="border-2 border-gray-400 p-4 rounded-lg">
+                                <h4 className="text-lg font-semibold text-gray-700 mb-2">Comment Details</h4>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <p><strong>Username:</strong> {selectedComment.user?.fullName}</p>
+                                    <p><strong>User ID:</strong> {selectedComment.user?._id}</p>
+                                    <p><strong>Content:</strong> {selectedComment.content}</p>
+                                    <p>
+                                        <strong>Status:</strong>
+                                        <span className={`ml-2 px-2 py-1 rounded ${selectedComment.status === 'approved' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                                            {selectedComment.status}
+                                        </span>
+                                    </p>
+                                    <p><strong>Time:</strong> {new Date(selectedComment.dateCreated).toLocaleString()}</p>
+                                </div>
+                            </div>
+
+                            <div className="border-2 border-gray-400 p-4 rounded-lg">
+                                <h4 className="text-lg font-semibold text-gray-700 mb-2">Video Details</h4>
+                                <p className="mb-4"><strong>Live Stream ID:</strong> {selectedVideo._id}</p>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <p><strong>Title:</strong> {selectedVideo.title}</p>
+                                    <p><strong>Description:</strong> {selectedVideo.description}</p>
+                                    <p><strong>Views:</strong> {selectedVideo.numOfViews}</p>
+                                </div>
+                                <div className="mt-4">
+                                    <img src={selectedVideo.thumbnailUrl} alt={selectedVideo.title} className="w-full h-auto rounded-lg shadow-md" />
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

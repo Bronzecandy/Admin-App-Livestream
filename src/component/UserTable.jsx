@@ -119,6 +119,7 @@ const UserTable = () => {
                                         <td className="px-2 py-4 text-center whitespace-nowrap">
                                             <div className="flex justify-center space-x-2">
                                                 <button
+                                                
                                                     onClick={() => handleUpdateUser(user)} // Open form for editing
                                                     className="p-2 text-blue-600 hover:bg-blue-50 rounded"
                                                 >
