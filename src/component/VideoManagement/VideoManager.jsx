@@ -48,8 +48,13 @@ const VideoManager = () => {
     }, [title, enumMode, sortBy, order, size, page, token]);
 
     const deleteVideo = (id) => {
+        console.log(id);
         if (window.confirm("Bạn có chắc chắn muốn xóa video này không?")) {
-            axios.delete(`https://671893417fc4c5ff8f4a0505.mockapi.io/videos/${id}`)
+            axios.delete(`https://social-media-z5a2.onrender.com/api/videos/${id}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                }
+            })
                 .then(() => {
                     setVideos(videos.filter(video => video.id !== id));
                 })
@@ -58,6 +63,8 @@ const VideoManager = () => {
                 });
         }
     };
+
+
 
     const handlePlayVideo = (video) => {
         setPlayingVideo(video);
@@ -277,10 +284,8 @@ const VideoManager = () => {
 
             {showForm && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-                    <div className="bg-white p-4 rounded-lg shadow-lg w-1/2">
-                        <h3 className="text-xl font-semibold mb-4">
-                           Update Video
-                        </h3>
+                    <div className="w-full">
+                       
                         <AddVideoForm
                             onEdit={editVideo}
                             video={editingVideo}
