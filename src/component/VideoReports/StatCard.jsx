@@ -10,14 +10,18 @@ const StatCard = ({ icon: Icon, title, value, className }) => {
     bgColor = 'bg-green-100';
   } else if (title === 'This month') {
     bgColor = 'bg-yellow-100';
-  } else if (title === 'Today Revenue') {
+  } else if (title === 'Today Revenue' || title === 'This month video') {
     bgColor = 'bg-blue-100';
   } else if (title === 'This Week Revenue') {
     bgColor = 'bg-green-100';
-  } else if (title === 'This Month Revenue') {
+  } else if (title === 'This Month Revenue' || title === 'Total Stream') {
     bgColor = 'bg-purple-100';
-  } else if (title === 'Total Revenue') {
+  } else if (title === 'Total Revenue' || title === 'Total video') {
     bgColor = 'bg-gray-100';
+  } else if (title === 'Today Video') {
+    bgColor = 'bg-pink-100';
+  } else if (title === 'This week video') {
+    bgColor = 'bg-orange-100';
   }
 
   return (

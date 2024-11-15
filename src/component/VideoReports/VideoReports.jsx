@@ -10,13 +10,13 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-  Area,
-  AreaChart
 } from 'recharts';
-import StatCard from './Statcard';
+import StatCard from './StatCard';
 import LoadingSpinner from './LoadingSpinner';
 import NewUsersStats from './StatsNewUsers';
 import StatsRevenue from './StatsRevenue';
+import StatsVideos from './StatsVideos';
+import StatsStream from './StatsStream';
 
 // Mock data generator with real days data
 const generateMockData = (days = 30) => {
@@ -24,12 +24,6 @@ const generateMockData = (days = 30) => {
   for (let i = 0; i < days; i++) {
     const date = new Date();
     date.setDate(date.getDate() - i);
-
-    const views = Math.floor(Math.random() * 1000) + 500;
-    const adsRevenue = views * (Math.random() * 0.3 + 0.2); // $0.2-0.5 per view
-    const subscriptionRevenue = views * (Math.random() * 0.4 + 0.3); // $0.3-0.7 per view
-    const donationRevenue = views * (Math.random() * 0.2 + 0.1); // $0.1-0.3 per view
-
     data.unshift({
       date: date.toLocaleDateString(),
       views: Math.floor(Math.random() * 1000) + 500,
@@ -38,22 +32,10 @@ const generateMockData = (days = 30) => {
       shares: Math.floor(Math.random() * 30) + 10,
       activeUsers: Math.floor(Math.random() * 300) + 200,
       newVideos: Math.floor(Math.random() * 20) + 5,
-      adsRevenue: parseFloat(adsRevenue.toFixed(2)),
-      subscriptionRevenue: parseFloat(subscriptionRevenue.toFixed(2)),
-      donationRevenue: parseFloat(donationRevenue.toFixed(2)),
-      totalRevenue: parseFloat((adsRevenue + subscriptionRevenue + donationRevenue).toFixed(2)),
     });
   }
   return data;
 };
-
-// Mock video data
-const mockVideoData = [
-  { id: 1, title: "Live Gaming Session", views: 1200, likes: 450, comments: 89, duration: "1:30:00" },
-  { id: 2, title: "Cooking Tutorial", views: 850, likes: 320, comments: 45, duration: "45:00" },
-  { id: 3, title: "Music Performance", views: 2300, likes: 890, comments: 156, duration: "1:00:00" },
-  { id: 4, title: "Tech Review", views: 1500, likes: 560, comments: 92, duration: "25:00" },
-];
 
 const VideoReport = () => {
   const [analyticsData, setAnalyticsData] = useState([]);
@@ -106,7 +88,6 @@ const VideoReport = () => {
         <h1 className="text-3xl font-bold text-gray-800">Video Analytics Dashboard</h1>
       </div>
 
-      {/* Main content with loading state */}
       {loading ? (
         <LoadingSpinner />
       ) : (
@@ -185,55 +166,13 @@ const VideoReport = () => {
 
             {activeTab === 'videos' && (
               <div className="overflow-x-auto">
-                <table className="w-full whitespace-nowrap">
-                  <thead>
-                    <tr className="bg-gray-50">
-                      <th className="text-left p-4 font-semibold text-gray-600">Title</th>
-                      <th className="text-left p-4 font-semibold text-gray-600">Views</th>
-                      <th className="text-left p-4 font-semibold text-gray-600">Likes</th>
-                      <th className="text-left p-4 font-semibold text-gray-600">Comments</th>
-                      <th className="text-left p-4 font-semibold text-gray-600">Duration</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {mockVideoData.map(video => (
-                      <tr key={video.id} className="border-b border-gray-200 hover:bg-gray-50">
-                        <td className="p-4">{video.title}</td>
-                        <td className="p-4">{video.views}</td>
-                        <td className="p-4">{video.likes}</td>
-                        <td className="p-4">{video.comments}</td>
-                        <td className="p-4">{video.duration}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                <StatsVideos />
               </div>
             )}
 
             {activeTab === 'streams' && (
               <div className="overflow-x-auto">
-                <table className="w-full whitespace-nowrap">
-                  <thead>
-                    <tr className="bg-gray-50">
-                      <th className="text-left p-4 font-semibold text-gray-600">Title</th>
-                      <th className="text-left p-4 font-semibold text-gray-600">Views</th>
-                      <th className="text-left p-4 font-semibold text-gray-600">Likes</th>
-                      <th className="text-left p-4 font-semibold text-gray-600">Comments</th>
-                      <th className="text-left p-4 font-semibold text-gray-600">Duration</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {mockVideoData.map(video => (
-                      <tr key={video.id} className="border-b border-gray-200 hover:bg-gray-50">
-                        <td className="p-4">{video.title}</td>
-                        <td className="p-4">{video.views}</td>
-                        <td className="p-4">{video.likes}</td>
-                        <td className="p-4">{video.comments}</td>
-                        <td className="p-4">{video.duration}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                <StatsStream />
               </div>
             )}
           </div>

@@ -9,7 +9,7 @@ import {
     Legend,
     ResponsiveContainer,
 } from 'recharts';
-import StatCard from './Statcard';
+import StatCard from './StatCard';
 import LoadingSpinner from './LoadingSpinner';
 import VideoServices from './VideoServices';
 

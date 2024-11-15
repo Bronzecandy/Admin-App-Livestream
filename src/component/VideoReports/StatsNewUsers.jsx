@@ -8,7 +8,7 @@ import {
     Tooltip,
     ResponsiveContainer,
 } from "recharts";
-import StatCard from "./Statcard";
+import StatCard from "./StatCard";
 import LoadingSpinner from "./LoadingSpinner";
 import VideoServices from "./VideoServices";
 
@@ -26,6 +26,7 @@ const NewUsersStats = () => {
     useEffect(() => {
         const fetchNewUsersData = async () => {
             try {
+                setLoading(true);
                 const data = await VideoServices.getNewUsersStats();
                 setNewUsersData(data.newUsers);
             } catch (error) {

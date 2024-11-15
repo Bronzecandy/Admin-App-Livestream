@@ -35,7 +35,7 @@ const VideoServices = {
                 `${API_URL}/api/statistics/revenue`,
                 {
                     params: {
-                        year: year
+                        year: year,
                     },
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -47,6 +47,44 @@ const VideoServices = {
         } catch (error) {
             console.error("Error fetching revenue data:", error);
             throw new Error("Unable to get revenue information");
+        }
+    },
+
+    getVideoStats: async () => {
+        try {
+            await VideoServices.login();
+            const response = await axios.get(
+                `${API_URL}/api/statistics/videos`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+            return response.data;
+        } catch (error) {
+            console.error("Error fetching videos data:", error);
+            throw new Error("Unable to get videos information");
+        }
+    },
+
+    getStreamStats: async () => {
+        try {
+            await VideoServices.login();
+            const response = await axios.get(
+                `${API_URL}/api/statistics/streams`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+            return response.data;
+        } catch (error) {
+            console.error("Error fetching streams data:", error);
+            throw new Error("Unable to get streams information");
         }
     },
 };
