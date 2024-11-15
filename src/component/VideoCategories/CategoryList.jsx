@@ -156,7 +156,12 @@ const CategoryList = ({ categories: initialCategories }) => {
           }}
           className="px-4 py-2 border rounded-lg"
         />
-        <button onClick={handleCreateClick} className="px-4 py-2 bg-blue-600 text-white rounded-lg">New Category</button>
+        <button onClick={handleCreateClick} className="px-4 py-2 bg-blue-600 text-white rounded-lg flex items-center justify-center">
+          {/* <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+          </svg> */}
+          Create New Category
+        </button>
       </div>
 
       <div className="overflow-x-auto">
@@ -166,7 +171,7 @@ const CategoryList = ({ categories: initialCategories }) => {
               <th className="text-left py-4 px-2 w-24">Image</th>
               <th className="text-left py-4 px-2 w-1/3">Name</th>
               <th className="text-left py-4 px-2 w-1/4">Date Created</th>
-              <th className="text-right py-4 px-12 w-32">Actions</th>
+              <th className="text-right py-4 px-4 w-32">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -183,9 +188,22 @@ const CategoryList = ({ categories: initialCategories }) => {
                 <td className="py-4 px-2">{new Date(category.dateCreated).toLocaleDateString()}</td>
                 <td className="py-4 px-2">
                   <div className="flex justify-end space-x-2">
-                    <button onClick={() => handleViewDetails(category)} className="p-2 text-gray-600 hover:bg-gray-50 rounded">View</button>
-                    <button onClick={() => handleEditClick(category)} className="p-2 text-blue-600 hover:bg-blue-50 rounded">Edit</button>
-                    <button onClick={() => handleDeleteClick(category._id)} className="p-2 text-gray-600 hover:bg-gray-50 rounded">Delete</button>
+                    <button onClick={() => handleViewDetails(category)} className="p-2 text-gray-600 hover:bg-gray-50 rounded flex items-center justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                    </button>
+                    <button onClick={() => handleEditClick(category)} className="p-2 text-blue-600 hover:bg-blue-50 rounded flex items-center justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-2-2l4-4m0 0L18 7m-4 4v6" />
+                      </svg>
+                    </button>
+                    <button onClick={() => handleDeleteClick(category._id)} className="p-2 text-gray-600 hover:bg-gray-50 rounded flex items-center justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
                   </div>
                 </td>
               </tr>
@@ -201,9 +219,17 @@ const CategoryList = ({ categories: initialCategories }) => {
           </p>
         </div>
         <div className="flex space-x-2">
-          <button onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} disabled={currentPage === 1} className="px-3 py-1 rounded-md hover:bg-gray-100 disabled:opacity-50">Previous</button>
+          <button onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} disabled={currentPage === 1} className="px-3 py-1 rounded-md hover:bg-gray-100 disabled:opacity-50 flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
           {renderPaginationButtons()}
-          <button onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages} className="px-3 py-1 rounded-md hover:bg-gray-100 disabled:opacity-50">Next</button>
+          <button onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages} className="px-3 py-1 rounded-md hover:bg-gray-100 disabled:opacity-50 flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
         </div>
       </div>
 
@@ -221,9 +247,13 @@ const CategoryList = ({ categories: initialCategories }) => {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden">
             {/* Modal Content */}
-            <div className="bg-gray-50 px-6 py-4 border-b border-gray-100">
+            <div className="bg-gray-50 px-6 py-4 border-b border-gray-100 flex justify-between items-center">
               <h2 className="text-xl font-semibold text-gray-800">Category Details</h2>
-              <button onClick={() => setIsDetailsModalOpen(false)} className="text-gray-400 hover:text-gray-600">Close</button>
+              <button onClick={() => setIsDetailsModalOpen(false)} className="text-gray-400 hover:text-gray-600 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
             </div>
             <div className="p-6">
               {/* Image Section */}
@@ -250,14 +280,18 @@ const CategoryList = ({ categories: initialCategories }) => {
                 </div>
               </div>
             </div>
-            <div className="bg-gray-50 px-6 py-4 border-t border-gray-100">
-              <button onClick={() => setIsDetailsModalOpen(false)} className="px-4 py-2 bg-white text-gray-700 rounded-lg">Close</button>
+            <div className="bg-gray-50 px-6 py-4 border-t border-gray-100 flex justify-end">
+              <button onClick={() => setIsDetailsModalOpen(false)} className="px-4 py-2 bg-white text-gray-700 rounded-lg flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
             </div>
           </div>
         </div>
       )}
     </div>
-  );
+    )
 };
 
 CategoryList.propTypes = {
