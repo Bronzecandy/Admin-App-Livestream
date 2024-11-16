@@ -25,11 +25,15 @@ const StatsVideos = () => {
         monthly: [],
     });
 
+    const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+
     useEffect(() => {
         const fetchVideosData = async () => {
             try {
                 setLoading(true);
-                const { videos } = await VideoServices.getVideoStats();
+                const { videos } = await VideoServices.getVideoStats(
+                    selectedYear
+                );
                 setVideoStats(videos);
             } catch (error) {
                 console.error("Error fetching video data:", error);
@@ -42,17 +46,20 @@ const StatsVideos = () => {
             }
         };
         fetchVideosData();
-    }, []);
+    }, [selectedYear]);
 
     const { today, thisMonth, thisWeek, monthly, total } = videoStats;
 
-    const formattedMonthlyData =
-        Array.isArray(monthly) && monthly.length > 0
-            ? monthly.map((item) => ({
-                  monthYear: `${item._id.month}/${item._id.year}`,
-                  videoCount: item.videoCount,
-              }))
-            : [{ monthYear: "No data", videoCount: 0 }];
+    const formattedMonthlyData = monthly
+        .filter((item) => item._id.year === selectedYear)
+        .map((item) => ({
+            month: item._id.month,
+            videoCount: item.videoCount,
+        }));
+
+    const handleYearChange = (event) => {
+        setSelectedYear(parseInt(event.target.value));
+    };
 
     if (loading) {
         return <LoadingSpinner />;
@@ -76,26 +83,78 @@ const StatsVideos = () => {
                 <StatCard title="Total video" value={total} />
             </div>
             <div className="mt-8">
-                <h2 className="text-2xl font-bold mb-4 text-center">
-                    Monthly Video Stats
-                </h2>
-                <div className="w-full h-80">
-                    <ResponsiveContainer>
-                        <LineChart data={formattedMonthlyData}>
-                            <XAxis dataKey="month" />
-                            <YAxis />
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <Tooltip className="bg-white shadow-md" />
-                            <Legend />
-                            <Line
-                                type="monotone"
-                                dataKey="videoCount"
-                                stroke="#4bc0c0"
-                                name="Total Video"
-                            />
-                        </LineChart>
-                    </ResponsiveContainer>
+                <div className="mb-4">
+                    <label htmlFor="year-filter" className="mr-2">
+                        Filter by year:
+                    </label>
+                    <select
+                        id="year-filter"
+                        value={selectedYear}
+                        onChange={handleYearChange}
+                        className="p-2 border rounded"
+                    >
+                        {Array.from(
+                            { length: 5 },
+                            (_, i) => new Date().getFullYear() - i
+                        ).map((year) => (
+                            <option key={year} value={year}>
+                                {year}
+                            </option>
+                        ))}
+                    </select>
                 </div>
+
+                {formattedMonthlyData.length > 0 ? (
+                    <div>
+                        <h2 className="text-2xl font-bold mb-4 text-center">
+                            Monthly Video Stats
+                        </h2>
+                        <div className="w-full h-80">
+                            <ResponsiveContainer>
+                                <LineChart data={formattedMonthlyData}>
+                                    <CartesianGrid strokeDasharray="3 3" />
+                                    <XAxis dataKey="month" />
+                                    <YAxis
+                                        type="number"
+                                        domain={["dataMin", "dataMax"]}
+                                    />
+                                    <Tooltip
+                                        className="bg-white shadow-md"
+                                        content={({ payload, label }) => (
+                                            <div className="p-2">
+                                                {payload &&
+                                                payload.length > 0 &&
+                                                typeof payload[0].value ===
+                                                    "number" ? (
+                                                    <p>
+                                                        Total:{" "}
+                                                        {payload[0].value}
+                                                    </p>
+                                                ) : (
+                                                    <p>
+                                                        No data available for{" "}
+                                                        {label}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        )}
+                                    />
+                                    <Legend />
+                                    <Line
+                                        type="monotone"
+                                        dataKey="videoCount"
+                                        stroke="#3B82F6"
+                                        name="Total Video"
+                                    />
+                                </LineChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded relative">
+                        No video data available.
+                    </div>
+                )}
             </div>
         </div>
     );

@@ -50,7 +50,7 @@ const VideoServices = {
         }
     },
 
-    getVideoStats: async () => {
+    getVideoStats: async (year) => {
         try {
             await VideoServices.login();
             const response = await axios.get(
@@ -69,7 +69,7 @@ const VideoServices = {
         }
     },
 
-    getStreamStats: async () => {
+    getStreamStats: async (year) => {
         try {
             await VideoServices.login();
             const response = await axios.get(
