@@ -1,214 +1,195 @@
-import React, { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { updateCategory, addCategory } from './MockData';
+import CategoryService from './CategoryService';
 
-const CategoryForm = ({ isOpen, category, onClose, onUpdate }) => {
+const CategoryForm = ({ isOpen, category, onClose, onSuccess, onRefresh }) => {
   const [formData, setFormData] = useState({
     name: '',
-    description: '',
-    status: 'active',
-    featured: false,
-    products: 0
+    categoryUrl: null,
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState('');
-  const isEditMode = !!category;
-
-  // Populate form data if category exists
   useEffect(() => {
     if (category) {
       setFormData({
         name: category.name || '',
-        description: category.description || '',
-        status: category.status || 'active',
-        featured: category.featured || false,
-        products: category.products || 0
+        categoryUrl: null,
       });
     } else {
-      // Reset form for new category
       setFormData({
         name: '',
-        description: '',
-        status: 'active',
-        featured: false,
-        products: 0
+        categoryUrl: null,
       });
     }
   }, [category]);
 
-  if (!isOpen) return null;
-
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
+    const { name, value, files } = e.target;
+    if (name === 'categoryUrl') {
+      setFormData((prev) => ({
+        ...prev,
+        categoryUrl: files[0],
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
+  };
+
+  const validateForm = () => {
+    if (!formData.name.trim()) {
+      setError('Vui lòng nhập tên thể loại');
+      return false;
+    }
+    if (!formData.categoryUrl) {
+      setError('Vui lòng chọn một hình ảnh');
+      return false;
+    }
+    return true;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.name.trim()) {
-      setError('Category name is required');
+    if (!validateForm()) {
       return;
     }
 
-    setIsSubmitting(true);
+    setLoading(true);
+    setError(null);
+
     try {
-      let updatedCategory;
-      if (isEditMode) {
-        updatedCategory = await updateCategory({
-          ...category,
-          ...formData
-        });
+      const submissionData = {
+        name: formData.name,
+        categoryUrl: formData.categoryUrl, // Thêm file vào dữ liệu gửi
+      };
+
+      let result;
+      if (category) {
+        result = await CategoryService.updateCategory(category._id, submissionData);
       } else {
-        updatedCategory = await addCategory(formData);
+        result = await CategoryService.createCategory(submissionData);
       }
-      onUpdate(updatedCategory);
+
+      onSuccess(result);
+      onRefresh();
       onClose();
     } catch (err) {
-      setError(`Failed to ${isEditMode ? 'update' : 'create'} category. Please try again.`);
+      setError(err.message || 'Có lỗi xảy ra. Vui lòng thử lại.');
     } finally {
-      setIsSubmitting(false);
+      setLoading(false);
     }
   };
 
+  if (!isOpen) return null;
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-lg w-[800px] max-h-[90vh] overflow-y-auto">
-        <div className="p-6">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold">
-              {isEditMode ? 'Edit Category' : 'New Category'}
-            </h2>
-            <button
-              onClick={onClose}
-              className="text-gray-500 hover:text-gray-700"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex justify-center items-center z-50">
+      <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md m-4 transform transition-all duration-300 hover:scale-[1.02]">
+        <div className="flex justify-between items-center mb-8">
+          <h2 className="text-3xl font-bold text-gray-800 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            {category ? 'Cập nhật thể loại' : 'Thêm thể loại mới'}
+          </h2>
+          <button onClick={onClose} className="text-gray-500 hover:text-red-500 transition-colors duration-200">
+            <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 rounded-lg shadow-sm animate-pulse">
+            <div className="flex items-center">
+              <svg className="h-6 w-6 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-1-9v4a1 1 0 102 0V9a1 1 0 10-2 0zm0-4a1 1 0 112 0 1 1 0 01-2 0z" clipRule="evenodd" />
               </svg>
-            </button>
+              <span className="font-medium">{error}</span>
+            </div>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-7">
+          <div className="group">
+            <label className="block text-sm font-semibold text-gray-700 mb-2 group-hover:text-blue-600 transition-colors duration-200">Tên thể loại *</label>
+            <input
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-3.5 rounded-xl border-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-blue-400"
+              placeholder="Nhập tên thể loại"
+            />
           </div>
 
-          <form onSubmit={handleSubmit}>
-            <div className="grid grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Category Name
-                  </label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Description
-                  </label>
-                  <textarea
-                    name="description"
-                    value={formData.description}
-                    onChange={handleChange}
-                    rows="4"
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Status
-                  </label>
-                  <select
-                    name="status"
-                    value={formData.status}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                  >
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Products
-                  </label>
-                  <input
-                    type="number"
-                    name="products"
-                    value={formData.products}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    name="featured"
-                    id="featured"
-                    checked={formData.featured}
-                    onChange={handleChange}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                  />
-                  <label htmlFor="featured" className="ml-2 block text-sm text-gray-700">
-                    Featured Category
-                  </label>
-                </div>
+          {formData.categoryUrl && (
+            <div className="group">
+              <label className="block text-sm font-semibold text-gray-700 mb-2 group-hover:text-blue-600 transition-colors duration-200">Xem trước</label>
+              <div className="relative overflow-hidden rounded-xl shadow-lg">
+                <img 
+                  src={typeof formData.categoryUrl === 'string' ? formData.categoryUrl : URL.createObjectURL(formData.categoryUrl)}
+                  alt="Preview"
+                  className="w-full h-56 object-cover transform transition-transform duration-300 hover:scale-110"
+                />
               </div>
             </div>
+          )}
 
-            {error && (
-              <div className="mt-4 text-red-600 text-sm">
-                {error}
-              </div>
-            )}
+          <div className="group">
+            <label className="block text-sm font-semibold text-gray-700 mb-2 group-hover:text-blue-600 transition-colors duration-200">Chọn hình ảnh *</label>
+            <input
+              type="file"
+              name="categoryUrl"
+              onChange={handleChange}
+              accept="image/*"
+              required
+              className="w-full px-4 py-3.5 rounded-xl border-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-blue-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+            />
+          </div>
 
-            <div className="mt-6 flex justify-end space-x-3">
-              <button
-                type="button"
-                onClick={onClose}
-                className="px-4 py-2 border rounded-lg text-gray-700 hover:bg-gray-50"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
-              >
-                {isSubmitting ? 'Saving...' : isEditMode ? 'Update Category' : 'Create Category'}
-              </button>
-            </div>
-          </form>
-        </div>
+          <div className="flex justify-end space-x-4 pt-6">
+            <button
+              type="button"
+              onClick={onClose}
+              disabled={loading}
+              className="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 hover:shadow-md transition-all duration-200 font-medium"
+            >
+              Hủy
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:shadow-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 min-w-[120px] font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? (
+                <svg className="animate-spin h-5 w-5 mx-auto" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                </svg>
+              ) : (
+                category ? 'Cập nhật' : 'Thêm mới'
+              )}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
-  );
+  )
 };
 
 CategoryForm.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   category: PropTypes.shape({
-    id: PropTypes.number,
+    _id: PropTypes.string,
     name: PropTypes.string,
-    description: PropTypes.string,
-    status: PropTypes.string,
-    featured: PropTypes.bool,
-    products: PropTypes.number
+    imageUrl: PropTypes.string,
   }),
   onClose: PropTypes.func.isRequired,
-  onUpdate: PropTypes.func.isRequired
+  onSuccess: PropTypes.func.isRequired,
+  onRefresh: PropTypes.func.isRequired,
 };
 
 export default CategoryForm;
