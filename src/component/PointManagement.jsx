@@ -12,7 +12,7 @@ export default function RewardPointManager() {
     const interval = setInterval(() => {
       setCurrentTime(prevTime => {
         const newTime = new Date(prevTime.getTime() + 1000);
-        updatePoints(newTime);
+        // updatePoints(newTime);
         return newTime;
       });
     }, 1000);
@@ -22,9 +22,9 @@ export default function RewardPointManager() {
   const fetchAccounts = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('https://6717fde3b910c6a6e02acc1a.mockapi.io/StreamerPoint');
+      const response = await fetch('https://social-media-z5a2.onrender.com/api/users?page=1&size=10');
       const data = await response.json();
-      setAccounts(data);
+      setAccounts(data.users);
     } catch (error) {
       console.error('Error fetching accounts:', error);
     } finally {
@@ -32,9 +32,18 @@ export default function RewardPointManager() {
     }
   };
 
+  const handleSearch = (event) => {
+    setSearchTerm(event.target.value);
+  };
+
+  const filteredAccounts = accounts.filter(account =>
+    account.fullName.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  /*************Từ phần này sẽ không hoạt động vì trái với nghiệp vụ***********************
   const updateAccountOnMockAPI = async (account) => {
     try {
-      const response = await fetch(`https://6717fde3b910c6a6e02acc1a.mockapi.io/StreamerPoint/${account.id}`, {
+      const response = await fetch(`https://6717fde3b910c6a6e02acc1a.mockapi.io/StreamerPoint/${account._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -55,7 +64,7 @@ export default function RewardPointManager() {
         if (account.isLive && account.liveStartTime) {
           const liveDuration = (currentTime.getTime() - new Date(account.liveStartTime).getTime()) / (1000 * 60 * 60);
           const additionalPoints = Math.floor(liveDuration / 3) * 50;
-          const updatedAccount = { ...account, points: account.initialPoints + additionalPoints };
+          const updatedAccount = { ...account, point: account.initialPoints + additionalPoints };
           updateAccountOnMockAPI(updatedAccount);
           return updatedAccount;
         }
@@ -64,23 +73,15 @@ export default function RewardPointManager() {
     );
   };
 
-  const handleSearch = (event) => {
-    setSearchTerm(event.target.value);
-  };
-
-  const filteredAccounts = accounts.filter(account =>
-    account.username.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
   const toggleLivestream = (account) => {
     const updatedAccount = {
       ...account,
       isLive: !account.isLive,
       liveStartTime: !account.isLive ? currentTime.toISOString() : null,
-      initialPoints: !account.isLive ? account.points : account.initialPoints
+      initialPoints: !account.isLive ? account.point : account.initialPoints
     };
     setAccounts(prevAccounts =>
-      prevAccounts.map(acc => acc.id === account.id ? updatedAccount : acc)
+      prevAccounts.map(acc => acc._id === account._id ? updatedAccount : acc)
     );
     updateAccountOnMockAPI(updatedAccount);
   };
@@ -96,6 +97,7 @@ export default function RewardPointManager() {
     const minutes = Math.floor((duration % (1000 * 60 * 60)) / (1000 * 60));
     return `${hours}h ${minutes}m`;
   };
+*************************************Kết thúc ở đây****************************/
 
   return (
     <div className="container mx-auto p-4 bg-gray-50">
@@ -113,13 +115,13 @@ export default function RewardPointManager() {
             />
           </div>
         </div>
-        <button
+        {/* <button
           onClick={increaseTime}
           className="flex items-center justify-center w-full md:w-auto bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition duration-300"
         >
           <FaFastForward className="mr-2" />
           Increase Time by 3 Hours
-        </button>
+        </button> */}
       </div>
       <div className="text-right mb-4 text-sm text-gray-600">
         Current Time: {currentTime.toLocaleString()}
@@ -132,35 +134,36 @@ export default function RewardPointManager() {
             <thead>
               <tr className="bg-gray-100">
                 <th className="w-1/4 py-2 px-4 border-b text-left">Streamer</th>
-                <th className="w-1/4 py-2 px-4 border-b text-center">Points</th>
-                <th className="w-1/4 py-2 px-4 border-b text-center">Live Duration</th>
-                <th className="w-1/4 py-2 px-4 border-b text-center">Actions</th>
+                <th className="w-1/4 py-2 px-4 border-b text-left">Points</th>
+                {/* <th className="w-1/4 py-2 px-4 border-b text-center">Live Duration</th>
+                <th className="w-1/4 py-2 px-4 border-b text-center">Actions</th> */}
               </tr>
             </thead>
             <tbody>
               {filteredAccounts.map(account => (
-                <tr key={account.id} className="hover:bg-gray-50">
+                <tr key={account._id} className="hover:bg-gray-50">
                   <td className="py-2 px-4 border-b">
                     <div className="flex items-left justify-start">
                       <FaTwitch className={`mr-2 ${account.isLive ? 'text-red-500' : 'text-gray-400'}`} />
-                      {account.username}
+                      {account.fullName}
                     </div>
                   </td>
                   <td className="py-2 px-4 border-b">
-                    <div className="flex items-center justify-center">
+                    <div className="flex items-center justify-start">
                       <FaStar className="text-yellow-500 mr-2" />
-                      {account.points}
+                      {account.point !== undefined ? account.point : 'None'}
                     </div>
                   </td>
-                  <td className="py-2 px-4 border-b">
+                  {/* <td className="py-2 px-4 border-b">
                     {account.isLive && (
                       <div className="flex items-center justify-center">
                         <FaClock className="mr-2 text-green-500" />
                         {formatDuration(account.liveStartTime)}
                       </div>
                     )}
-                  </td>
-                  <td className="py-2 px-4 border-b flex justify-center">
+                    <p className='flex items-center justify-center'>None</p>
+                  </td> */}
+                  {/* <td className="py-2 px-4 border-b flex justify-center">
                     <button
                       onClick={() => toggleLivestream(account)}
                       className={`flex items-center justify-center w-full sm:w-auto px-4 py-2 rounded-md transition duration-300 ${
@@ -172,7 +175,8 @@ export default function RewardPointManager() {
                       {account.isLive ? <FaStop className="mr-2" /> : <FaPlay className="mr-2" />}
                       {account.isLive ? 'End Stream' : 'Start Stream'}
                     </button>
-                  </td>
+                    None
+                  </td> */}
                 </tr>
               ))}
             </tbody>
