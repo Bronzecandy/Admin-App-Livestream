@@ -41,6 +41,10 @@ const UserTable = () => {
         fetchUsers(currentPage, searchQuery, order);
     }, [currentPage, order]);
 
+    const handlePageChange = (page) => {
+        setCurrentPage(page); // Update page number
+    };
+    
     const handleSearchKeyPress = (event) => {
         if (event.key === 'Enter') {
             setCurrentPage(1);
