@@ -56,6 +56,9 @@ const VideoServices = {
             const response = await axios.get(
                 `${API_URL}/api/statistics/videos`,
                 {
+                    params: {
+                        year: year,
+                    },
                     headers: {
                         Authorization: `Bearer ${token}`,
                         "Content-Type": "application/json",
@@ -75,6 +78,9 @@ const VideoServices = {
             const response = await axios.get(
                 `${API_URL}/api/statistics/streams`,
                 {
+                    params: {
+                        year: year,
+                    },
                     headers: {
                         Authorization: `Bearer ${token}`,
                         "Content-Type": "application/json",

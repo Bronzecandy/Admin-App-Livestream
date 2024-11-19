@@ -30,7 +30,7 @@ const StatsRevenue = () => {
         const fetchRevenueData = async () => {
             try {
                 setLoading(true);
-                const { revenue } = await VideoServices.getRevenueStats(selectedYear);
+                const { revenue = {} } = await VideoServices.getRevenueStats(selectedYear);
                 setRevenueData(revenue);
             } catch (error) {
                 console.error('Error fetching revenue data:', error);
@@ -43,7 +43,15 @@ const StatsRevenue = () => {
         fetchRevenueData();
     }, [selectedYear]);
 
-    const { today = 0, thisWeek = 0, thisMonth = 0, monthly = [], total = 0 } = revenueData;
+    const { today = 0, thisWeek = 0, thisMonth = 0, monthly = [], total = 0 } = revenueData ?? {};
+
+    if (!revenueData || Object.keys(revenueData).length === 0) {
+        return (
+            <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded relative">
+                No revenue data available.
+            </div>
+        );
+    }
 
     const formattedMonthlyData = monthly.filter(item => item.year === selectedYear).map((item) => ({
         month: item.month,
