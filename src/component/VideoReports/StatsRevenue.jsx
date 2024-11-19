@@ -43,7 +43,7 @@ const StatsRevenue = () => {
         fetchRevenueData();
     }, [selectedYear]);
 
-    const { today, thisWeek, thisMonth, monthly, total } = revenueData;
+    const { today = 0, thisWeek = 0, thisMonth = 0, monthly = [], total = 0 } = revenueData;
 
     const formattedMonthlyData = monthly.filter(item => item.year === selectedYear).map((item) => ({
         month: item.month,

@@ -46,7 +46,7 @@ const StatsStream = () => {
         fetchStreamsData();
     }, [selectedYear]);
 
-    const { today, thisMonth, thisWeek, monthly, total } = streamStats;
+    const { today = 0, thisMonth = 0, thisWeek = 0, monthly = [], total = 0 } = streamStats;
 
     const formattedMonthlyData = monthly.filter((item) => item._id.year === selectedYear).map((item) => ({
         month: item._id.month,

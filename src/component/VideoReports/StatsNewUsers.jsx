@@ -40,7 +40,7 @@ const NewUsersStats = () => {
         fetchNewUsersData();
     }, []);
 
-    const { today, thisWeek, thisMonth, monthly } = newUsersData;
+    const { today = 0, thisWeek = 0, thisMonth = 0, monthly = [] } = newUsersData;
 
     // Data format for column chart
     const formattedMonthlyData = Array.isArray(monthly)

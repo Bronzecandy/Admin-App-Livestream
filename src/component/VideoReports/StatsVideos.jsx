@@ -48,7 +48,7 @@ const StatsVideos = () => {
         fetchVideosData();
     }, [selectedYear]);
 
-    const { today, thisMonth, thisWeek, monthly, total } = videoStats;
+    const { today = 0, thisMonth = 0, thisWeek = 0, monthly = [], total = 0 } = videoStats;
 
     const formattedMonthlyData = monthly
         .filter((item) => item._id.year === selectedYear)
